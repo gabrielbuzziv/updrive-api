@@ -60,17 +60,4 @@ class NewDocumentsNotification extends Notification implements ShouldQueue
             ->regards($this->dispatch->user->name)
             ->from($this->dispatch->user->email, $this->dispatch->user->name);
     }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
-    {
-        return [
-            //
-        ];
-    }
 }
