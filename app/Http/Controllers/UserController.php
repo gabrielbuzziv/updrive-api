@@ -62,8 +62,17 @@ class UserController extends ApiController
      */
     public function add(UserRequest $request)
     {
-        foreach ($request->get('email') as $email) {
-            $user = User::create(['email' => $email, 'password' => str_random(8), 'is_active' => false]);
+        foreach ($request->input('email') as $email) {
+            $attributes = ['email' => $email, 'password' => str_random(8), 'is_active' => false];
+            $user = User::where(['email' => $email])
+                ->withTrashed()
+                ->first() ?:
+                User::create($attributes);
+
+            if ($user->trashed()) {
+                $user->restore();
+            }
+
             $permissions = Permission::where('name', '<>', 'manage-users')->pluck('id')->all();
             $user->perms()->sync($permissions);
             $user->notify(new CollaboratorInviteNotification($user));

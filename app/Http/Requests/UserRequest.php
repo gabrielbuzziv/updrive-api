@@ -16,7 +16,7 @@ class UserRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->can('manage-users');
+        return auth()->user()->can('manage-users');
     }
 
     /**
@@ -27,7 +27,7 @@ class UserRequest extends FormRequest
     public function rules()
     {
         return [
-            'email.*' => 'required|email|unique:users,email'
+            'email.*' => 'required|email|unique:account.users,email,NULL,id,deleted_at,NULL'
         ];
     }
 
