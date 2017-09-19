@@ -90,10 +90,11 @@ class CheckExpiredDocuments extends Command
                     $storage = storage_path("app/{$tmp}");
 
                     $local->put("{$tmp}", $file);
+                    $this->info(url('watermark.pdf'));
                     (new Pdf($storage))->stamp(url('watermark.pdf'))->saveAs($storage);
                     $watermarked = $local->get($tmp);
                     $s3->put($path, $watermarked);
-                    $local->delete($tmp);
+//                    $local->delete($tmp);
                 }
 
                 $this->info("O documento \"{$document->name}\" venceu.");
