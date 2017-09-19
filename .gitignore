@@ -4,6 +4,9 @@
 /public/css/
 /storage/*.key
 /storage/laravel.log
+!/storage/
+!/storage/app/
+!/storage/app/import/*
 /vendor
 /.idea
 Homestead.json
