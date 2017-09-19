@@ -33,9 +33,10 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->command('updrive:expiring-documents')->dailyAt('00:00');
+//        $schedule->command('updrive:expiring-documents')->dailyAt('00:00');
 //        $schedule->command('updrive:expired-documents')->dailyAt('00:00');
-        $schedule->command('updrive:expired-documents')->dailyAt('14:30');
+        $schedule->command('updrive:expiring-documents')->everyMinute();
+        $schedule->command('updrive:expired-documents')->everyMinute();
     }
 
     /**
