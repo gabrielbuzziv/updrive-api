@@ -34,18 +34,13 @@ class NewDocumentsNotification extends Notification implements ShouldQueue
 
     /**
      * Create a new notification instance.
-     *
-     * @param $dispatchId
-     * @param $contactId
-     * @param $accountId
+     * 
+     * @param DocumentDispatch $dispatch
+     * @param User $contact
      */
-    public function __construct($dispatchId, $contactId, $accountId)
+    public function __construct(DocumentDispatch $dispatch, User $contact)
     {
-        $account = Account::find($accountId);
-        setActiveAccount($account);
-
-        $contact = User::find($contactId);
-        $this->dispatch = DocumentDispatch::find($dispatchId);
+        $this->dispatch = $dispatch;
         $this->token = JWTAuth::fromUser($contact);
     }
 
