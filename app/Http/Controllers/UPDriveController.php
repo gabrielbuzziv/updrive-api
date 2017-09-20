@@ -194,7 +194,7 @@ class UPDriveController extends ApiController
                 $company->contacts()->attach($contact->id);
             }
 
-            $contact->notify(new NewDocumentsNotification($dispatch, $contact));
+            $contact->notify(new NewDocumentsNotification($dispatch->id, $contact->id, config('account')->id));
         }
 
         return $this->respond([
