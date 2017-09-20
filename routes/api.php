@@ -20,12 +20,6 @@ Route::post('password/request', 'PasswordResetController@sendResetLinkEmail');
 Route::post('password/reset', 'PasswordResetController@resetPassword');
 
 /**
- * SparkPostController routes.
- */
-Route::get('teste', 'SparkPostController@teste');
-Route::post('sparkpost', 'SparkPostController@webhook');
-
-/**
  * All the routes in this group will need to send a Header
  * Authorization with a valide token, withou this the user will
  * not be authorized to access the route.

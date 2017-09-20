@@ -328,7 +328,7 @@
                             </tr>
                             @endif
 
-                            @if (count($documents))
+                            @if (isset($documents) && count($documents))
                             <tr>
                                 <td style="width:600px;">
                             <![endif]-->
@@ -395,6 +395,8 @@
                             </td>
                             </tr>
                             @endif
+
+                            @if (isset($regards))
                             <tr>
                                 <td style="width:600px;">
                             <![endif]-->
@@ -411,7 +413,7 @@
                                                 <![endif]-->
                                                 <div style="cursor:auto;color:#888888;font-family:'Open Sans', Arial;font-size:14px;line-height:22px;text-align:left;">
                                                     Atenciosamente, <br>
-                                                    <b>{{ $regards }}</b></div>
+                                                    <b>{{ $regards['name'] }}</b> <small>({{ $regards['email'] }})</small></div>
                                                 <!--[if mso | IE]>
                                                 </td></tr></table>
                                                 <![endif]-->
@@ -423,6 +425,7 @@
                             <!--[if mso | IE]>
                             </td>
                             </tr>
+                            @endif
                             </table>
                             <![endif]-->
                         </td>
@@ -434,7 +437,7 @@
         </td></tr></table>
         <![endif]-->
 
-        @if ($footer)
+        @if (isset($footer))
         <!--[if mso | IE]>
         <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="600" align="center"
                style="width:600px;">

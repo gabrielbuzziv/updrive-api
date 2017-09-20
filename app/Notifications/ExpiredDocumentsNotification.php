@@ -3,20 +3,28 @@
 namespace App\Notifications;
 
 use App\Http\Controllers\Traits\Transformable;
-use App\Illuminate\Notifications\UPMailMessage;
 use App\UPCont\Transformer\DocumentTransformer;
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class ExpiredDocumentsNotification extends Notification implements ShouldQueue
+class ExpiredDocumentsNotification extends Notification
 {
-    use Queueable, Transformable;
 
-    protected $user;
+    use Transformable;
+
+    /**
+     * The attribute document.
+     *
+     * @var $this
+     */
     protected $documents;
+
+    /**
+     * The attribute token.
+     *
+     * @var
+     */
     protected $token;
 
     /**
@@ -28,15 +36,14 @@ class ExpiredDocumentsNotification extends Notification implements ShouldQueue
      */
     public function __construct($notification)
     {
-        $this->user = $notification->user;
         $this->documents = $this->transformCollection($notification->documents, new DocumentTransformer());
-        $this->token = JWTAuth::fromUser($this->user);
+        $this->token = JWTAuth::fromUser($notification->user);
     }
 
     /**
      * Get the notification's delivery channels.
      *
-     * @param  mixed  $notifiable
+     * @param  mixed $notifiable
      * @return array
      */
     public function via($notifiable)
@@ -47,32 +54,27 @@ class ExpiredDocumentsNotification extends Notification implements ShouldQueue
     /**
      * Get the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param  mixed $notifiable
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
     {
-        $amount = count($this->documents);
+        $subject = 'Alguns dos documentos que você enviou venceram sem ser abertos';
+        $account = config('account');
 
-        return (new UPMailMessage())
-            ->subject("{$amount} documento(s) que você enviou venceram sem ser aberto.")
-            ->line("Identificamos que {$amount} documento(s) venceram sem ser abertos, estou disponibilizando os documentos abaixo.")
-            ->documents($this->documents)
-            ->token($this->token)
-            ->regards(config('account')->name)
-            ->from(config('account')->email, config('account')->name);
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
-    {
-        return [
-            //
-        ];
+        return (new MailMessage())
+            ->from(env('MAIL_FROM_ADDRESS'), $account->name)
+            ->subject($subject)
+            ->view('emails.default', [
+                'subject'     => $subject,
+                'description' => 'Identificamos que alguns dos documentos que você enviou nos últimos dias não foram visualizados antes do prazo de vencimento. Abaixo está a lista dos documentos vencidos.',
+                'documents'   => $this->documents,
+                'regards'     => [
+                    'name'  => $account->name,
+                    'email' => $account->email,
+                ],
+                'token' => $this->token,
+                'authorize_url' => action('AuthController@refreshToken', $account->slug),
+            ]);
     }
 }

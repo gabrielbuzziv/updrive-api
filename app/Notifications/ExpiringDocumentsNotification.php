@@ -11,13 +11,23 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class ExpiringDocumentsNotification extends Notification implements ShouldQueue
+class ExpiringDocumentsNotification extends Notification
 {
 
-    use Queueable, Transformable;
+    use Transformable;
 
-    protected $contact;
+    /**
+     * The attribute documents.
+     *
+     * @var $this
+     */
     protected $documents;
+
+    /**
+     * The attribute token.
+     *
+     * @var
+     */
     protected $token;
 
     /**
@@ -28,9 +38,8 @@ class ExpiringDocumentsNotification extends Notification implements ShouldQueue
      */
     public function __construct($data)
     {
-        $this->contact = $data->contact;
         $this->documents = $this->transformCollection($data->documents, new DocumentTransformer());
-        $this->token = JWTAuth::fromUser($this->contact);
+        $this->token = JWTAuth::fromUser($data->contact);
     }
 
     /**
@@ -52,27 +61,24 @@ class ExpiringDocumentsNotification extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $amount = count($this->documents);
+        $subject = 'Não esqueça de baixar os documentos';
+        $account = config('account');
 
-        return (new UPMailMessage())
-            ->subject("Você tem {$amount} documento(s) com vencimento para hoje.")
-            ->line("Parece que há {$amount} documento(s) que ainda não foram baixados e vencerão hoje, estamos disponibilizando abaixo para você.")
-            ->token($this->token)
-            ->documents($this->documents)
-            ->regards(config('account')->name)
-            ->from(config('account')->email, config('account')->name);
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
-    {
-        return [
-            //
-        ];
+        return (new MailMessage())
+            ->from(env('MAIL_FROM_ADDRESS'), $account->name)
+            ->subject($subject)
+            ->view('emails.default', [
+                'subject'       => $subject,
+                'description'   => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para hoje.',
+                'documents'     => $this->documents,
+                'regards'       => [
+                    'name'  => $account->name,
+                    'email' => $account->email,
+                ],
+                'token'         => $this->token,
+                'authorize_url' => action('AuthController@refreshToken', $account->slug),
+                'frontend_url'  => config('app.frontend'),
+                'footer'        => true,
+            ]);
     }
 }

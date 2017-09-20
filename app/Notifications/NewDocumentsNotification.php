@@ -2,21 +2,18 @@
 
 namespace App\Notifications;
 
-use App\Account;
 use App\DocumentDispatch;
 use App\Http\Controllers\Traits\Transformable;
 use App\UPCont\Transformer\DocumentTransformer;
 use App\User;
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class NewDocumentsNotification extends Notification implements ShouldQueue
+class NewDocumentsNotification extends Notification
 {
 
-    use Queueable, Transformable;
+    use  Transformable;
 
     /**
      * Attribute Dispatch
@@ -34,7 +31,7 @@ class NewDocumentsNotification extends Notification implements ShouldQueue
 
     /**
      * Create a new notification instance.
-     * 
+     *
      * @param DocumentDispatch $dispatch
      * @param User $contact
      */
@@ -64,13 +61,16 @@ class NewDocumentsNotification extends Notification implements ShouldQueue
     public function toMail($notifiable)
     {
         return (new MailMessage())
-            ->from($this->dispatch->user->email, $this->dispatch->user->name)
+            ->from(env('MAIL_FROM_ADDRESS'), $this->dispatch->user->name)
             ->subject($this->dispatch->subject)
-            ->view('emails.documents', [
+            ->view('emails.default', [
                 'subject'       => $this->dispatch->subject,
                 'description'   => $this->dispatch->message,
                 'documents'     => $this->transformCollection($this->dispatch->documents, new DocumentTransformer()),
-                'regards'       => $this->dispatch->user->name,
+                'regards'       => [
+                    'name'  => $this->dispatch->user->name,
+                    'email' => $this->dispatch->user->email,
+                ],
                 'token'         => $this->token,
                 'authorize_url' => action('AuthController@refreshToken', config('account')->slug),
                 'frontend_url'  => config('app.frontend'),
