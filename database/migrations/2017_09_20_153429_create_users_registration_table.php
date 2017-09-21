@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class TriggerWhenANewUserIsContactIsCreated extends Migration
+class CreateUsersRegistrationTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class TriggerWhenANewUserIsContactIsCreated extends Migration
      */
     public function up()
     {
-        DB::unprepared("
-            CREATE TRIGGER tr_Contact_Address AFTER INSERT ON users FOR EACH ROW
-            BEGIN
-                INSERT INTO contacts_address(contact_id) VALUES(NEW.id);
-            END
-        ");
+        Schema::create('users_registration', function (Blueprint $table) {
+            $table->increments('id');
+            $table->string('email');
+            $table->string('token');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -28,6 +28,6 @@ class TriggerWhenANewUserIsContactIsCreated extends Migration
      */
     public function down()
     {
-        DB::unprepared("DROP TRIGGER tr_Contact_Address");
+        Schema::dropIfExists('users_registration');
     }
 }

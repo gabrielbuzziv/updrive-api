@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             /**
              * User aditional fields.
              */
+            $table->boolean('is_user')->default(false);
             $table->boolean('is_contact')->default(false);
             $table->boolean('is_active')->default(true);
 

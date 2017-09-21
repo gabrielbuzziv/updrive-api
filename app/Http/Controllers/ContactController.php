@@ -61,10 +61,15 @@ class ContactController extends ApiController
 
         try {
             $data['password'] = str_random(6);
-            $data['is_contact'] = 1;
-            $data['is_active'] = 1;
+            $data['is_contact'] = true;
 
-            $contact = User::create($data);
+            $contact = User::firstOrCreate(['email' => $data['email']], $data);
+
+            if (! $contact->wasRecentlyCreated) {
+                $contact->name = ! empty($data['name']) ? $data['name'] : $contact->name;
+                $contact->is_contact = true;
+                $contact->save();
+            }
 
             $this->syncCompanies($contact);
             $this->savePhones($contact);
@@ -117,7 +122,13 @@ class ContactController extends ApiController
 
             foreach ($items as $item) {
                 if ($contact = User::find($item)) {
-                    $contact->delete();
+                    if ($contact->is_user) {
+                        $contact->is_contact = false;
+                        $contact->save();
+                    } else {
+                        $contact->delete();
+                    }
+
                     $deleted ++;
                 }
             }
@@ -357,7 +368,8 @@ class ContactController extends ApiController
             || $header[6] != 'Complemento'
             || $header[7] != 'Bairro'
             || $header[8] != 'Cidade'
-            || $header[9] != 'Estado') {
+            || $header[9] != 'Estado'
+        ) {
             abort(404);
         }
     }

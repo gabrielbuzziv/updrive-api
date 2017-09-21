@@ -33,7 +33,7 @@ class ContactRequest extends FormRequest
             case 'POST': {
                 return [
                     'name'  => 'min:3',
-                    'email' => 'required|email|unique:users',
+                    'email' => 'required|email|unique:account.users,email,NULL,id,deleted_at,NULL,is_contact,1'
                 ];
             }
             case 'PUT':

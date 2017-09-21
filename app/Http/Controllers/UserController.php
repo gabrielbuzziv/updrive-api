@@ -9,18 +9,12 @@ use App\Http\Requests\ProfileRequest;
 use App\Http\Requests\RegisterUserRequest;
 use App\Notifications\CollaboratorInviteNotification;
 use App\Permission;
-use App\Role;
-use App\UPCont\Transformer\RoleTransformer;
 use App\UPCont\Transformer\UserTransformer;
 use App\User;
-use Illuminate\Database\QueryException;
+use App\UserRegistration;
 use Illuminate\Http\Request;
 use App\Http\Requests\UserRequest;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
-use Intervention\Image\Facades\Image;
-use phpDocumentor\Reflection\Types\Boolean;
 
 class UserController extends ApiController
 {
@@ -45,8 +39,7 @@ class UserController extends ApiController
     public function index()
     {
         $limit = request('limit') ?: 25;
-        $users = User::
-        regular()
+        $users = User::regular()
             ->search(request('filter'), null, true, true)
             ->orderBy('name')
             ->paginate($limit);
@@ -63,17 +56,21 @@ class UserController extends ApiController
     public function add(UserRequest $request)
     {
         foreach ($request->input('email') as $email) {
-            $attributes = ['email' => $email, 'password' => str_random(8), 'is_active' => false];
-            $user = User::where(['email' => $email])
-                ->withTrashed()
-                ->first() ?:
-                User::create($attributes);
+            $attributes = ['email' => $email, 'password' => str_random(8), 'is_active' => false, 'is_user' => true];
+            $user = User::where(['email' => $email])->withTrashed()->first() ?: User::create($attributes);
+
+            if (! $user->wasRecentlyCreated) {
+                $user->is_user = true;
+                $user->save();
+            }
 
             if ($user->trashed()) {
                 $user->restore();
             }
 
-            $permissions = Permission::where('name', '<>', 'manage-users')->pluck('id')->all();
+            UserRegistration::create(['email' => $user->email, 'token' => md5($user->email)]);
+
+            $permissions = Permission::whereNotIn('name', ['manage-users'])->pluck('id')->all();
             $user->perms()->sync($permissions);
             $user->notify(new CollaboratorInviteNotification($user));
         }
@@ -96,7 +93,14 @@ class UserController extends ApiController
             foreach ($items as $item) {
                 if ($user = User::find($item)) {
                     if (! $user->can('manage-users')) {
-                        $user->delete();
+                        if ($user->is_contact) {
+                            $user->is_user = false;
+                            $user->perms()->sync([]);
+                            $user->save();
+                        } else {
+                            $user->delete();
+                        }
+
                         $deleted ++;
                     }
                 }
@@ -108,26 +112,6 @@ class UserController extends ApiController
 
             return $this->respondInternalError($e);
         }
-    }
-
-    /**
-     * Check if email is valid for an register.
-     *
-     * @return mixed
-     */
-    public function validateInvite()
-    {
-        if (request('email')) {
-            $user = User::where('email', request('email'))->where('is_active', false)->first();
-
-            if ($user) {
-                return $this->respond($this->transformItem($user, new UserTransformer()));
-            }
-
-            return $this->respondNotFound(null);
-        }
-
-        return $this->respondNotFound(null);
     }
 
     /**
@@ -143,6 +127,12 @@ class UserController extends ApiController
         $user->password = $request->get('password');
         $user->is_active = true;
         $user->save();
+
+        $registration = (new UserRegistration())
+            ->where('email', $user->email)
+            ->where('token', md5($user->email))
+            ->first();
+        $registration->delete();
 
         return $this->respond($this->transformItem($user, new UserTransformer()));
     }

@@ -12,9 +12,14 @@ use Zizaco\Entrust\Traits\EntrustUserTrait;
 
 class User extends Authenticatable implements JWTSubject
 {
+
     use Notifiable, SearchableTrait;
-    use EntrustUserTrait { restore as private restoreEntrust; }
-    use SoftDeletes { restore as private restoreSoftDelete; }
+    use EntrustUserTrait {
+        restore as private restoreEntrust;
+    }
+    use SoftDeletes {
+        restore as private restoreSoftDelete;
+    }
 
     /**
      * The attribute set the database connection as account.
@@ -39,9 +44,9 @@ class User extends Authenticatable implements JWTSubject
      */
     protected $searchable = [
         'columns' => [
-            'users.name' => 10,
-            'users.email' => 9
-        ]
+            'users.name'  => 10,
+            'users.email' => 9,
+        ],
     ];
 
     /**
@@ -50,8 +55,13 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'photo',
-        'is_contact', 'is_active'
+        'name',
+        'email',
+        'password',
+        'photo',
+        'is_user',
+        'is_contact',
+        'is_active',
     ];
 
     /**
@@ -60,7 +70,7 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'created_at', 'updated_at'
+        'password', 'remember_token', 'created_at', 'updated_at',
     ];
 
     /**
@@ -131,7 +141,7 @@ class User extends Authenticatable implements JWTSubject
      * Check if user has a permission by its name.
      *
      * @param string|array $permission
-     * @param bool         $requireAll
+     * @param bool $requireAll
      *
      * @return bool
      */
@@ -140,9 +150,9 @@ class User extends Authenticatable implements JWTSubject
         if (is_array($permission)) {
             foreach ($permission as $permName) {
                 $hasPerm = $this->can($permName);
-                if ($hasPerm && !$requireAll) {
+                if ($hasPerm && ! $requireAll) {
                     return true;
-                } elseif (!$hasPerm && $requireAll) {
+                } elseif (! $hasPerm && $requireAll) {
                     return false;
                 }
             }
@@ -189,7 +199,7 @@ class User extends Authenticatable implements JWTSubject
      */
     public function scopeRegular($query)
     {
-        return $query->where('is_contact', false);
+        return $query->where('is_user', true);
     }
 
     /**
@@ -252,22 +262,6 @@ class User extends Authenticatable implements JWTSubject
     }
 
     /**
-     * Get all permissions that user have and add in an
-     * array with permissions names.
-     *
-     * @return array
-     */
-//    public function getPermissionsAttribute()
-//    {
-//        $permissions = $this->roles()
-//            ->join('permission_role', 'permission_role.role_id', 'roles.id')
-//            ->join('permissions', 'permissions.id', 'permission_role.permission_id')
-//            ->get(['permissions.name'])->toArray();
-//
-//        return array_values(array_unique(array_flatten($permissions)));
-//    }
-
-    /**
      * Check if user is active.
      *
      * @return mixed
@@ -285,7 +279,7 @@ class User extends Authenticatable implements JWTSubject
     public function companies()
     {
         return $this->belongsToMany(Company::class, 'company_contact', 'contact_id', 'company_id')
-                    ->with('address');
+            ->with('address');
     }
 
     /**

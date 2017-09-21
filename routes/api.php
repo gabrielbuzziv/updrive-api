@@ -8,9 +8,9 @@ Route::get('auth/token', 'AuthController@refreshToken');
 Route::post('auth', 'AuthController@authenticate');
 
 /**
- * Inviste register
+ * Invite register
  */
-Route::post('users/validate-invite', 'UserController@validateInvite');
+Route::post('users/registration/validate', 'UserRegistrationController@isValid');
 Route::post('users/register/{user}', 'UserController@register');
 
 /**

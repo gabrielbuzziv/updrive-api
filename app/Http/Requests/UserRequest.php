@@ -27,7 +27,7 @@ class UserRequest extends FormRequest
     public function rules()
     {
         return [
-            'email.*' => 'required|email|unique:account.users,email,NULL,id,deleted_at,NULL'
+            'email.*' => 'required|email|unique:account.users,email,NULL,id,deleted_at,NULL,is_user,1'
         ];
     }
 

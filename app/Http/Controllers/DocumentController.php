@@ -132,7 +132,7 @@ class DocumentController extends ApiController
      */
     public function download(Document $document)
     {
-        if (! auth()->user()->can('manage-updrive')) {
+        if (!! auth()->user()->sharedDocuments->where('id', $document->id)->count()) {
             $this->isAuthorized($document);
 
             $document->status = 3;
@@ -161,7 +161,7 @@ class DocumentController extends ApiController
      */
     public function visualize(Document $document)
     {
-        if (! auth()->user()->can('manage-updrive')) {
+        if (!! auth()->user()->sharedDocuments->where('id', $document->id)->count()) {
             $this->isAuthorized($document);
             $document->status = 3;
             $document->save();

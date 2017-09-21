@@ -48,6 +48,7 @@ class CollaboratorInviteNotification extends Notification
         $subject = 'Você foi convidado para participar do UP Drive';
         $account = config('account');
         $front_url = config('app.frontend');
+        $token = md5($this->user->email);
 
         return (new MailMessage())
             ->from(env('MAIL_FROM_ADDRESS'), $account->name)
@@ -56,7 +57,7 @@ class CollaboratorInviteNotification extends Notification
                 'subject'       => $subject,
                 'description'   => "Você foi convidado para participar da equipe de colaboradores da {$account->name}, clique no botão abaixo para aceitar e finalizar seu registro.",
                 'action_button' => [
-                    'href' => "{$front_url}/registrar?email={$this->user->email}",
+                    'href' => "{$front_url}/registrar?email={$this->user->email}&token={$token}",
                     'text' => 'Aceitar o convite',
                 ],
                 'regards'       => [

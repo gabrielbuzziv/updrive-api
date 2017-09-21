@@ -42,7 +42,7 @@ class UPDriveController extends ApiController
             ->search(request('filter'), null, true, true)
             ->leftJoin('company_contact', 'company_contact.company_id', 'companies.id')
             ->where(function ($query) {
-                if (auth()->user()->is_contact)
+                if (auth()->user()->is_contact && ! auth()->user()->is_user)
                     $query->where('company_contact.contact_id', auth()->user()->id);
             })
             ->orderBy('identifier')
@@ -70,7 +70,7 @@ class UPDriveController extends ApiController
                 if (request('company'))
                     $query->where('documents.company_id', request('company'));
 
-                if (auth()->user()->is_contact) {
+                if (auth()->user()->is_contact && ! auth()->user()->is_user) {
                     $query->where('document_contact.contact_id', auth()->user()->id);
                     $query->where('company_contact.contact_id', auth()->user()->id);
                 }
@@ -105,7 +105,7 @@ class UPDriveController extends ApiController
                 if (request('company'))
                     $query->where('documents.company_id', request('company'));
 
-                if (auth()->user()->is_contact) {
+                if (auth()->user()->is_contact && ! auth()->user()->is_user) {
                     $query->where('document_contact.contact_id', auth()->user()->id);
                     $query->where('company_contact.contact_id', auth()->user()->id);
                 }
@@ -192,6 +192,11 @@ class UPDriveController extends ApiController
 
             if (! $company->contacts->contains($contact->id)) {
                 $company->contacts()->attach($contact->id);
+            }
+
+            if (! $contact->is_contact) {
+                $contact->is_contact = true;
+                $contact->save();
             }
 
             $contact->notify(new NewDocumentsNotification($dispatch, $contact));
@@ -298,7 +303,7 @@ class UPDriveController extends ApiController
             ->join('company_contact', 'company_contact.company_id', 'documents.company_id')
             ->join('document_contact', 'document_contact.document_id', 'documents.id')
             ->where(function ($query) {
-                if (auth()->user()->is_contact) {
+                if (auth()->user()->is_contact && ! auth()->user()->is_user) {
                     $query->where('document_contact.contact_id', auth()->user()->id);
                     $query->where('company_contact.contact_id', auth()->user()->id);
                 }
