@@ -34,11 +34,13 @@ Route::group(['middleware' => 'auth:api'], function () {
     /**
      * UserController routes.
      */
-    Route::post('users/{user}/permission/{permission}', 'UserController@togglePermission');
+    Route::post('users/{user}/permissions', 'UserController@togglePermission');
+    Route::post('users/profile', 'UserController@updateProfile');
+    Route::post('users/profile/password', 'UserController@updatePassword');
 
     Route::get('users', 'UserController@index');
     Route::post('users', 'UserController@add');
-    Route::delete('users', 'UserController@destroy');
+    Route::delete('users/{user}', 'UserController@revoke');
 
     /**
      * Permissions routes
@@ -98,4 +100,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('updrive/documents', 'UPDriveController@documents');
     Route::get('updrive/amounts', 'UPDriveController@amounts');
     Route::post('updrive/send', 'UPDriveController@send');
+
+    Route::get('account', 'AccountController@show');
 });

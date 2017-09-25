@@ -7,6 +7,7 @@ use App\Http\Controllers\Traits\Sortable;
 use App\Http\Controllers\Traits\Transformable;
 use App\Http\Requests\ProfileRequest;
 use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\UserPasswordRequest;
 use App\Notifications\CollaboratorInviteNotification;
 use App\Permission;
 use App\UPCont\Transformer\UserTransformer;
@@ -26,9 +27,7 @@ class UserController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-users', ['except' => [
-            'validateInvite', 'register',
-        ]]);
+        $this->middleware('permission:manage-users', ['except' => 'register']);
     }
 
     /**
@@ -38,14 +37,12 @@ class UserController extends ApiController
      */
     public function index()
     {
-        $limit = request('limit') ?: 25;
         $users = User::regular()
-            ->search(request('filter'), null, true, true)
-            ->orderBy('name')
-            ->paginate($limit);
+            ->search(request('filter'))
+            ->orderBy('id', 'desc')
+            ->get();
 
         return $this->respond([
-            'total' => $users->total(),
             'items' => $this->transformCollection($users, new UserTransformer(), ['permissions']),
         ]);
     }
@@ -56,22 +53,14 @@ class UserController extends ApiController
     public function add(UserRequest $request)
     {
         foreach ($request->input('email') as $email) {
-            $attributes = ['email' => $email, 'password' => str_random(8), 'is_active' => false, 'is_user' => true];
+            $attributes = ['name' => $email, 'email' => $email, 'password' => str_random(8), 'is_active' => false, 'is_user' => true];
             $user = User::where(['email' => $email])->withTrashed()->first() ?: User::create($attributes);
 
-            if (! $user->wasRecentlyCreated) {
-                $user->is_user = true;
-                $user->save();
-            }
+            $this->setAsUser($user);
+            $this->restoreTrashed($user);
+            $this->createRegistrationToken($user);
+            $this->addDefaultUserPermissions($user);
 
-            if ($user->trashed()) {
-                $user->restore();
-            }
-
-            UserRegistration::create(['email' => $user->email, 'token' => md5($user->email)]);
-
-            $permissions = Permission::whereNotIn('name', ['manage-users'])->pluck('id')->all();
-            $user->perms()->sync($permissions);
             $user->notify(new CollaboratorInviteNotification($user));
         }
     }
@@ -80,34 +69,31 @@ class UserController extends ApiController
      * Walk in an array of ids and try to instanciate each one as a User,
      * if exists delete from database.
      *
-     * @param Request $request
+     * @param User $user
      * @return mixed
      */
-    public function destroy(Request $request)
+    public function revoke(User $user)
     {
-        $items = $request->input('items');
-
         try {
-            $deleted = 0;
-
-            foreach ($items as $item) {
-                if ($user = User::find($item)) {
-                    if (! $user->can('manage-users')) {
-                        if ($user->is_contact) {
-                            $user->is_user = false;
-                            $user->perms()->sync([]);
-                            $user->save();
-                        } else {
-                            $user->delete();
-                        }
-
-                        $deleted ++;
-                    }
-                }
+            if ($user->can('manage-users') || $user->can('manage-account')) {
+                return $this->respondBadRequest(null);
             }
 
-            return $this->respond(['total' => $deleted]);
-        } catch (\Exception $e) {
+            if ($registration = UserRegistration::where('email', $user->email)->where('token', md5($user->email))->first()) {
+                $registration->delete();
+            }
+
+            if ($user->is_contact) {
+                $user->is_user = false;
+                $user->save();
+
+                $user->perms()->sync([]);
+            } else {
+                $user->delete();
+            }
+
+            return $this->respond(['revoked' => true]);
+        } catch (Exception $e) {
             Log::error(logMessage($e, 'Ocorreu um erro ao remover colaborador.'), logUser());
 
             return $this->respondInternalError($e);
@@ -135,5 +121,122 @@ class UserController extends ApiController
         $registration->delete();
 
         return $this->respond($this->transformItem($user, new UserTransformer()));
+    }
+
+    /**
+     * Toggle user permission.
+     *
+     * @param User $user
+     * @return mixed
+     */
+    public function togglePermission(User $user)
+    {
+        if (request('permission')) {
+            if (auth()->user()->id == $user->id) {
+                return $this->respondBadRequest(null, 'Você não pode gerenciar suas permissões.');
+            }
+
+            $permission = Permission::where('name', request('permission'))->first();
+
+            if ($permission->users->count() == 1 && $permission->users->contains($user)) {
+                return $this->respondBadRequest(null, 'Pelo menos um membro precisa ter esta permissão.');
+            }
+
+            $user->perms()->toggle($permission);
+            return $this->respond($user->perms->pluck('name')->all());
+        }
+
+        return $this->respondNotFound(null);
+    }
+
+    /**
+     * Update User profile.
+     *
+     * @return mixed
+     */
+    public function updateProfile()
+    {
+        try {
+            $user = auth()->user();
+            $user->update(request()->all());
+
+            return $this->respond($this->transformItem($user, new UserTransformer()));
+        } catch (Exception $e) {
+            Log::error(logMessage($e, 'Ocorreu um erro ao atualizar dados do usuário.'), logUser());
+
+            return $this->respondInternalError($e);
+        }
+    }
+
+    /**
+     * Update User profile.
+     *
+     * @param UserPasswordRequest $request
+     * @return mixed
+     */
+    public function updatePassword(UserPasswordRequest $request)
+    {
+        try {
+            $user = auth()->user();
+
+            if ($user->can('manage-account') || $user->can('manage-users')) {
+                return $this->respondBadRequest(null, 'Você não pode remover este membro.');
+            }
+
+            $user->update($request->all());
+
+            return $this->respond($this->transformItem($user, new UserTransformer()));
+        } catch (Exception $e) {
+            Log::error(logMessage($e, 'Ocorreu um erro ao atualizar dados do usuário.'), logUser());
+
+            return $this->respondInternalError($e);
+        }
+    }
+
+    /**
+     * If user was not recently created, update "is_user" to true.
+     *
+     * @param User $user
+     */
+    private function setAsUser(User $user)
+    {
+        if (! $user->wasRecentlyCreated) {
+            $user->is_user = true;
+            $user->save();
+        }
+    }
+
+    /**
+     * Restore user if were trashed.
+     *
+     * @param User $user
+     */
+    private function restoreTrashed(User $user)
+    {
+        if ($user->trashed()) {
+            $user->deleted_at = null;
+            $user->save();
+        }
+    }
+
+    /**
+     * Create a registation token.
+     *
+     * @param User $user
+     */
+    private function createRegistrationToken(User $user)
+    {
+        UserRegistration::create(['email' => $user->email, 'token' => md5($user->email)]);
+    }
+
+    /**
+     * Sync user with the default permissions.
+     *
+     * @param User $user
+     */
+    private function addDefaultUserPermissions(User $user)
+    {
+        $permissions = Permission::whereNotIn('name', ['manage-users', 'manage-account'])->pluck('id')->all();
+        $user->perms()->sync($permissions);
     }
 }

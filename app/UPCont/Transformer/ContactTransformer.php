@@ -34,12 +34,17 @@ class ContactTransformer extends TransformerAbstract
      */
     public function transform(User $contact)
     {
+        $gravatarUrl = 'https://www.gravatar.com/avatar/';
+
         return [
             'id'     => (int) $contact->id,
             'name'   => $contact->name,
             'email'  => $contact->email,
             'contact' => (bool) $contact->is_contact,
             'active' => (bool) $contact->is_active,
+            'links' => [
+                'gravatar' => sprintf('%s%s', $gravatarUrl, md5(strtolower($contact->email)))
+            ]
         ];
     }
 

@@ -32,4 +32,14 @@ class Permission extends EntrustPermission
     protected $hidden = [
         'created_at', 'updated_at', 'pivot'
     ];
+
+    /**
+     * A permission has man users.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function users()
+    {
+        return $this->belongsToMany(User::class);
+    }
 }

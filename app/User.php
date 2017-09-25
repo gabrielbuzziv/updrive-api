@@ -29,15 +29,6 @@ class User extends Authenticatable implements JWTSubject
     protected $connection = 'account';
 
     /**
-     * Fix the duplicate restore.
-     */
-    public function restore()
-    {
-        $this->restoreEntrust();
-        $this->restoreSoftDelete();
-    }
-
-    /**
      * Serchable filter.
      *
      * @var array
@@ -79,6 +70,15 @@ class User extends Authenticatable implements JWTSubject
      * @var array
      */
     protected $dates = ['deleted_at'];
+
+    /**
+     * Fix the duplicate restore.
+     */
+    public function restore()
+    {
+        $this->restoreEntrust();
+        $this->restoreSoftDelete();
+    }
 
     /**
      * Return the user identifier to JWT authentication.

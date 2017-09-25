@@ -61,13 +61,69 @@ class Company extends Model
      */
     public function setNicknameAttribute($value)
     {
-        if (empty($value)) {
-            $this->attributes['nickname'] = $this->name;
-        } else {
-            $this->attributes['nickname'] = $value;
-        }
+        $this->attributes['nickname'] = empty($value) ? $this->name : $value;
     }
-    
+
+    /**
+     * Set the taxvat attribute.
+     *
+     * @param $value
+     */
+    public function setTaxvatAttribute($value)
+    {
+        $this->attributes['taxvat'] = empty($value) ? null : $value;
+    }
+
+    /**
+     * Set the docnumber attribute.
+     *
+     * @param $value
+     */
+    public function setDocnumberAttribute($value)
+    {
+        $this->attributes['docnumber'] = empty($value) ? null : $value;
+    }
+
+    /**
+     * Set the docnumber_town attribute.
+     *
+     * @param $value
+     */
+    public function setDocnumberTownAttribute($value)
+    {
+        $this->attributes['docnumber_town'] = empty($value) ? null : $value;
+    }
+
+    /**
+     * Set the email attribute.
+     *
+     * @param $value
+     */
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = empty($value) ? null : $value;
+    }
+
+    /**
+     * Set the phone attribute.
+     *
+     * @param $value
+     */
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['phone'] = empty($value) ? null : $value;
+    }
+
+    /**
+     * Set the identifier attribute.
+     *
+     * @param $value
+     */
+    public function setIdentifierAttribute($value)
+    {
+        $this->attributes['identifier'] = empty($value) ? null : $value;
+    }
+
     /**
      * A company belongs to many users that is_contact.
      */
