@@ -61,7 +61,7 @@ class UPDriveController extends ApiController
      */
     public function pending()
     {
-        $include = ['company'];
+        $include = ['company', 'user', 'sharedWith'];
         $documents = Document::select(DB::raw('DISTINCT documents.*'))
             ->with($include)
             ->leftJoin('company_contact', 'company_contact.company_id', 'documents.company_id')
@@ -95,7 +95,7 @@ class UPDriveController extends ApiController
     {
         $query = request('query');
         $limit = request('limit') ?: 25;
-        $include = ['company'];
+        $include = ['company', 'user', 'sharedWith'];
         $documents = Document::select(DB::raw('DISTINCT documents.*'))
             ->with($include)
             ->leftJoin('company_contact', 'company_contact.company_id', 'documents.company_id')
@@ -186,7 +186,7 @@ class UPDriveController extends ApiController
 
             array_push($documentsId, $document->id);
         }
-
+        
         foreach ($contacts as $contact) {
             $dispatch->contacts()->attach($contact->id);
 

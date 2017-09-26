@@ -25,7 +25,7 @@ class DocumentTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'history', 'user', 'company'
+        'history', 'user', 'company', 'sharedWith'
     ];
 
     /**
@@ -50,6 +50,17 @@ class DocumentTransformer extends TransformerAbstract
                 'visualize' => action('DocumentController@visualize', [config('account')->slug, $document->id]),
             ],
         ];
+    }
+
+    /**
+     * Include contact transformer.
+     *
+     * @param Document $document
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeSharedWith(Document $document)
+    {
+        return $this->collection($document->sharedWith, new ContactTransformer());
     }
 
     /**
