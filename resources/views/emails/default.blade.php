@@ -163,12 +163,10 @@
         }
 
         .document-link {
-            border: 1px solid #ddd;
-            padding: 10px;
-            border-radius: 2px;
             font-weight: 600;
-            color: #444;
+            color: #4a90e2;
             text-decoration: none;
+            text-transform: uppercase;
         }
 
         @media all and (min-width: 600px) {
@@ -182,10 +180,6 @@
 
             .td {
                 padding: 10px;
-            }
-
-            .document-link {
-                padding: 5px 10px;
             }
         }
     </style>
@@ -355,25 +349,33 @@
                                                                     <table cellpadding="0" cellspacing="0"
                                                                            style="cellspacing:0px;color:#444;font-family:'Open Sans', Arial;font-size:14px;line-height:22px;table-layout:auto;"
                                                                            width="100%" border="0">
-                                                                        <tr class="thead">
-                                                                            <th class="th">Documento</th>
-                                                                            <th class="th center hide-column">
-                                                                                Competência
-                                                                            </th>
-                                                                            <th class="th center hide-column">
-                                                                                Vencimento
-                                                                            </th>
-                                                                            <th></th>
+                                                                        <tr style="border-bottom: 3px solid #efefef;" class="thead">
+                                                                            <th style="text-align: left; padding: 10px; font-size: 12px; color: #333; text-transform: uppercase;" class="th">Documento</th>
+                                                                            <th style="text-align: right; padding: 10px; font-size: 12px; color: #333; text-transform: uppercase;" class="th hide-column"></th>
+                                                                            <th style="text-align: right; padding: 10px; font-size: 12px; color: #333; text-transform: uppercase;" class="th"></th>
                                                                         </tr>
 
                                                                         @foreach ($documents as $document)
-                                                                            <tr class="tbody {{ $loop->last ? 'no-border' : '' }}">
-                                                                                <td class="td">{{ $document['name'] }}</td>
-                                                                                <td class="td center hide-column">{{ $document['cycle'] }}</td>
-                                                                                <td class="td center hide-column">{{ $document['validity'] }}</td>
-                                                                                <td class="td right">
+                                                                            <tr style="border-bottom: 1px solid #efefef; {{ $loop->last ? 'border: 0;' : '' }}" class="tbody">
+                                                                                <td style="padding: 20px 10px; font-size: 12px; color: #444; text-align: left;" class="td">
+                                                                                    {{ $document['name'] }}
+                                                                                    @if ($document['validity'])
+                                                                                    <small>(com vencimento para {{ $document['validity'] }})</small>
+                                                                                    @endif
+                                                                                </td>
+                                                                                <td style="padding: 20px 10px; font-size: 12px; color: #444; text-align: right;" class="td right hide-column">
+                                                                                    @if ($document['type']['ext'] == 'pdf')
+                                                                                        <a href="{{ $authorize_url }}?token={{ $token }}&redirect={{ $document['links']['visualize'] }}"
+                                                                                           style="font-weight: 600; color: #4a90e2; text-decoration: none; text-transform: uppercase;" class="document-link">
+                                                                                            Visualizar
+                                                                                        </a>
+                                                                                    @endif
+                                                                                </td>
+                                                                                <td style="padding: 20px 10px; font-size: 12px; color: #444; text-align: right;" class="td right">
                                                                                     <a href="{{ $authorize_url }}?token={{ $token }}&redirect={{ $document['links']['download'] }}"
-                                                                                       class="document-link">Download</a>
+                                                                                       style="font-weight: 600; color: #4a90e2; text-decoration: none; text-transform: uppercase;" class="document-link">
+                                                                                        Baixar
+                                                                                    </a>
                                                                                 </td>
                                                                             </tr>
                                                                         @endforeach
@@ -458,7 +460,7 @@
                             <div style="cursor:auto;color:#999;font-family:'Open Sans', Arial;font-size:12px;line-height:22px;text-align:center;">
                                 Ao baixar ou visualizar os documentos deste e-mail, você está concordando que os
                                 recebeu. <br> Quer ter mais controle dos documentos que te enviamos?
-                                <a href="{{ $frontend_url }}/login?token={{ $token }}" class="footer-link">Acessar o {{ config('app.name') }}</a>
+                                <a href="{{ $frontend_url }}/login?token={{ $token }}" style="color: #888888;" class="footer-link">Acessar o {{ config('app.name') }}</a>
                             </div>
                             <!--[if mso | IE]>
                             </td></tr></table>

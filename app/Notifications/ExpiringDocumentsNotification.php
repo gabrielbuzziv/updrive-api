@@ -66,7 +66,7 @@ class ExpiringDocumentsNotification extends Notification
 
         return (new MailMessage())
             ->from(env('MAIL_FROM_ADDRESS'), $account->name)
-            ->subject($subject)
+            ->subject(sprintf('%s: %s', $account->name, $subject))
             ->view('emails.default', [
                 'subject'       => $subject,
                 'description'   => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para hoje.',

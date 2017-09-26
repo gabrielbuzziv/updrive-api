@@ -62,7 +62,7 @@ class NewDocumentsNotification extends Notification
     {
         return (new MailMessage())
             ->from(env('MAIL_FROM_ADDRESS'), $this->dispatch->user->name)
-            ->subject($this->dispatch->subject)
+            ->subject(sprintf('%s: %s', config('account')->name, $this->dispatch->subject))
             ->view('emails.default', [
                 'subject'       => $this->dispatch->subject,
                 'description'   => $this->dispatch->message,
