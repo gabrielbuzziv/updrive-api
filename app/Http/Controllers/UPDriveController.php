@@ -187,12 +187,6 @@ class UPDriveController extends ApiController
             array_push($documentsId, $document->id);
         }
 
-        $email = [];
-        foreach($contacts as $c) {
-            $email[] = $c->email;
-        }
-        dd($email);
-
         foreach ($contacts as $contact) {
             $dispatch->contacts()->attach($contact->id);
 
