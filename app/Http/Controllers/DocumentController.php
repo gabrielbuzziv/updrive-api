@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Document;
+use App\Events\DocumentStatusUpdated;
 use App\Http\Controllers\Traits\Transformable;
 use App\Http\Requests\UploadDocumentRequest;
 use App\UPCont\Transformer\CompanyTransformer;
@@ -10,6 +11,7 @@ use App\UPCont\Transformer\ContactTransformer;
 use App\UPCont\Transformer\DocumentTransformer;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Redis;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
@@ -166,6 +168,8 @@ class DocumentController extends ApiController
             $document->status = 3;
             $document->save();
             $document->history()->create(['user_id' => Auth::user()->id, 'action' => 4]);
+
+            event(new DocumentStatusUpdated($document));
         }
 
         $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);

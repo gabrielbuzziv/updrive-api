@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Authentication routes.
  */
