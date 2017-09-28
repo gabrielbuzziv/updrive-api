@@ -18,6 +18,12 @@ Route::post('password/request', 'PasswordResetController@sendResetLinkEmail');
 Route::post('password/reset', 'PasswordResetController@resetPassword');
 
 /**
+ * WebhookController routes.
+ * All webhooks should access this controller.
+ */
+Route::post('webhook/tracking-deliveries', 'WebhookController@trackingDeliveries');
+
+/**
  * All the routes in this group will need to send a Header
  * Authorization with a valide token, withou this the user will
  * not be authorized to access the route.
