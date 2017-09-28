@@ -14,8 +14,9 @@ class WebhookController extends Controller
 
         Log::useDailyFiles(storage_path('logs/tracking-deliveries.log'));
         Log::info([
-            'account' => $params['account'],
-            'dispatch' => $params['dispatch']
+            'params' => $params
+//            'account' => $params['account'],
+//            'dispatch' => $params['dispatch']
         ]);
     }
 }
