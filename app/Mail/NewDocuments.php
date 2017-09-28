@@ -20,9 +20,16 @@ class NewDocuments extends Mailable
     /**
      * Dispatch
      *
-     * @var DocumentDispatch
+     * @var
      */
     protected $dispatch;
+
+    /**
+     * Contact
+     *
+     * @var
+     */
+    protected $contact;
 
     /**
      * Token
@@ -40,7 +47,8 @@ class NewDocuments extends Mailable
     public function __construct(DocumentDispatch $dispatch, User $contact)
     {
         $this->dispatch = $dispatch;
-        $this->token = JWTAuth::fromUser($contact);
+        $this->contact = $contact;
+        $this->token = JWTAuth::fromUser($this->contact);
     }
 
     /**
@@ -70,8 +78,9 @@ class NewDocuments extends Mailable
 
         $this->withSwiftMessage(function ($message) {
             $variables = json_encode([
-                'account'  => config('account')->slug,
+                'account'  => config('account')->id,
                 'dispatch' => $this->dispatch->id,
+                'contact'  => $this->contact->id,
             ]);
 
             $message->getHeaders()

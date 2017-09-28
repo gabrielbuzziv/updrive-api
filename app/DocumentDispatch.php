@@ -37,7 +37,7 @@ class DocumentDispatch extends Model
     {
         return $this->belongsTo(User::class);
     }
-    
+
     /**
      * A document dispatch belongs to a company.
      *
@@ -66,5 +66,15 @@ class DocumentDispatch extends Model
     public function contacts()
     {
         return $this->belongsToMany(User::class, 'document_dispatch_contact', 'dispatch_id', 'contact_id');
+    }
+
+    /**
+     * Has many DocumentDispatchTracking.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function tracking()
+    {
+        return $this->hasMany(DocumentDispatchTracking::class);
     }
 }

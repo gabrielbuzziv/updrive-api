@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Company;
 use App\Document;
 use App\DocumentDispatch;
+use App\DocumentDispatchTracking;
 use App\Http\Controllers\Traits\Filterable;
 use App\Http\Controllers\Traits\Transformable;
 use App\Http\Requests\SendDocumentRequest;
@@ -63,7 +64,7 @@ class UPDriveController extends ApiController
      */
     public function pending()
     {
-        $include = ['company', 'user', 'sharedWith'];
+        $include = ['company', 'user', 'history'];
         $documents = Document::select(DB::raw('DISTINCT documents.*'))
             ->with($include)
             ->leftJoin('company_contact', 'company_contact.company_id', 'documents.company_id')
@@ -97,7 +98,7 @@ class UPDriveController extends ApiController
     {
         $query = request('query');
         $limit = request('limit') ?: 25;
-        $include = ['company', 'user', 'sharedWith'];
+        $include = ['company', 'user', 'history.user'];
         $documents = Document::select(DB::raw('DISTINCT documents.*'))
             ->with($include)
             ->leftJoin('company_contact', 'company_contact.company_id', 'documents.company_id')
@@ -141,7 +142,7 @@ class UPDriveController extends ApiController
         $documents = $this->getDocumentsByCompany()->where('documents.status', 2)->count(DB::raw('DISTINCT documents.id'));
 
         return $this->respond([
-            'pendings'  => $pendings, 
+            'pendings'  => $pendings,
             'documents' => $documents,
         ]);
     }
@@ -188,7 +189,7 @@ class UPDriveController extends ApiController
 
             array_push($documentsId, $document->id);
         }
-        
+
         foreach ($contacts as $contact) {
             $dispatch->contacts()->attach($contact->id);
 
@@ -200,8 +201,13 @@ class UPDriveController extends ApiController
                 $contact->is_contact = true;
                 $contact->save();
             }
-            
+
             Mail::to($contact->email)->send(new NewDocuments($dispatch, $contact));
+            DocumentDispatchTracking::create([
+                'dispatch_id' => $dispatch->id,
+                'contact_id'  => $contact->id,
+                'status'      => 'sent',
+            ]);
         }
 
         return $this->respond([
