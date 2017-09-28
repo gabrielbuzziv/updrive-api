@@ -202,8 +202,6 @@ class UPDriveController extends ApiController
             }
             
             Mail::to($contact->email)->send(new NewDocuments($dispatch, $contact));
-
-//            $contact->notify(new NewDocumentsNotification($dispatch, $contact));
         }
 
         return $this->respond([
