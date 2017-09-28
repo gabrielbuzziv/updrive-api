@@ -70,7 +70,7 @@ class NewDocuments extends Mailable
 
         $this->withSwiftMessage(function ($message) {
             $variables = json_encode([
-                'account'  => config('account'),
+                'account'  => config('account')->slug,
                 'dispatch' => $this->dispatch->id,
             ]);
 
