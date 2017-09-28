@@ -68,14 +68,14 @@ class NewDocuments extends Mailable
                 'footer'        => true,
             ]);
 
-        $this->withSwiftMessage(function ($message) {
-            $variables = json_encode([
-                'account'  => config('account')->slug,
-                'dispatch' => $this->dispatch->id,
-            ]);
-
-            $message->getHeaders()
-                ->addTextHeader('X-Mailgun-Variables', $variables);
-        });
+//        $this->withSwiftMessage(function ($message) {
+//            $variables = json_encode([
+//                'account'  => config('account')->slug,
+//                'dispatch' => $this->dispatch->id,
+//            ]);
+//
+//            $message->getHeaders()
+//                ->addTextHeader('X-Mailgun-Variables', $variables);
+//        });
     }
 }
