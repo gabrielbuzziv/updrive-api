@@ -2,20 +2,23 @@
 
 namespace App\Listeners;
 
+use App\DocumentDispatch;
+use App\User;
 use Illuminate\Mail\Events\MessageSending;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MessageSendingListener
 {
+    
+
     /**
      * Create the event listener.
      *
-     * @return void
      */
     public function __construct()
     {
-        //
+        
     }
 
     /**
@@ -29,6 +32,6 @@ class MessageSendingListener
         $message = $event->message;
 
         $headers = $message->getHeaders();
-        $headers->addTextHeader('X-MSYS-API', 'asd');
+        $headers->addTextHeader('X-Mailgun-Variables', 'asd');
     }
 }

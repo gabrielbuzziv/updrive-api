@@ -140,6 +140,8 @@ class DocumentController extends ApiController
             $document->status = 3;
             $document->save();
             $document->history()->create(['user_id' => Auth::user()->id, 'action' => 3]);
+
+            event(new DocumentStatusUpdated($document));
         }
 
         $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);

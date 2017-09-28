@@ -8,6 +8,7 @@ use App\DocumentDispatch;
 use App\Http\Controllers\Traits\Filterable;
 use App\Http\Controllers\Traits\Transformable;
 use App\Http\Requests\SendDocumentRequest;
+use App\Mail\NewDocuments;
 use App\Notifications\NewDocumentsNotification;
 use App\UPCont\Transformer\CompanyTransformer;
 use App\UPCont\Transformer\DocumentTransformer;
@@ -15,6 +16,7 @@ use App\UPCont\Transformer\FolderTransformer;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 class UPDriveController extends ApiController
@@ -198,8 +200,10 @@ class UPDriveController extends ApiController
                 $contact->is_contact = true;
                 $contact->save();
             }
+            
+            Mail::to($contact->email)->send(new NewDocuments($dispatch, $contact));
 
-            $contact->notify(new NewDocumentsNotification($dispatch, $contact));
+//            $contact->notify(new NewDocumentsNotification($dispatch, $contact));
         }
 
         return $this->respond([
