@@ -46,6 +46,6 @@ class DocumentStatusUpdated implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('updrive');
+        return new Channel('documents');
     }
 }

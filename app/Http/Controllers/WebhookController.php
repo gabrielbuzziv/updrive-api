@@ -5,13 +5,13 @@ namespace App\Http\Controllers;
 use App\Account;
 use App\DocumentDispatch;
 use App\DocumentDispatchTracking;
-use App\Events\MailTrackingUpdate;
+use App\Events\NewMailTracking;
 use App\User;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
-
     /**
      * Tracking Deliveries.
      */
@@ -20,6 +20,17 @@ class WebhookController extends Controller
         if ($this->isTrackable()) {
             $this->setupDatabase();
             $this->track('delivered');
+        }
+    }
+
+    /**
+     * Tracking Opened.
+     */
+    public function trackingOpened()
+    {
+        if ($this->isTrackable()) {
+            $this->setupDatabase();
+            $this->track('opened');
         }
     }
 
@@ -69,7 +80,7 @@ class WebhookController extends Controller
             if ($contact->id == $contactId) {
                 $this->createTracking($dispatch, $contact, $status);
 
-                event(new MailTrackingUpdate($dispatch));
+                event(new NewMailTracking());
             }
         });
     }

@@ -6,12 +6,14 @@ use App\Company;
 use App\Document;
 use App\DocumentDispatch;
 use App\DocumentDispatchTracking;
+use App\Events\NewMailTracking;
 use App\Http\Controllers\Traits\Filterable;
 use App\Http\Controllers\Traits\Transformable;
 use App\Http\Requests\SendDocumentRequest;
 use App\Mail\NewDocuments;
 use App\Notifications\NewDocumentsNotification;
 use App\UPCont\Transformer\CompanyTransformer;
+use App\UPCont\Transformer\DocumentDispatchTrackingTransformer;
 use App\UPCont\Transformer\DocumentTransformer;
 use App\UPCont\Transformer\FolderTransformer;
 use App\User;
@@ -208,6 +210,7 @@ class UPDriveController extends ApiController
                 'contact_id'  => $contact->id,
                 'status'      => 'sent',
             ]);
+            event(new NewMailTracking());
         }
 
         return $this->respond([
@@ -216,6 +219,25 @@ class UPDriveController extends ApiController
         ]);
     }
 
+    /**
+     * Get dispatchs tracking.
+     *
+     * @return mixed
+     */
+    public function tracking()
+    {
+        $limit = request('limit') ?: 25;
+        $includes = ['contact', 'dispatch.user', 'dispatch.company', 'dispatch.documents'];
+        $tracks = DocumentDispatchTracking::with($includes)
+            ->orderBy('created_at', 'DESC')
+            ->paginate($limit);
+
+        return $this->respond([
+            'total' => $tracks->total(),
+            'items' => $this->transformCollection($tracks, new DocumentDispatchTrackingTransformer(), $includes)
+        ]);
+    }
+    
     /**
      * Parse the company to find is already exist,
      * creating a new one if necessary and than returning the object.
