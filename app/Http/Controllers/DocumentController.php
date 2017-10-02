@@ -70,8 +70,9 @@ class DocumentController extends ApiController
         try {
             $filename = $document->filename;
 
+            $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);
+            Storage::disk('s3')->delete($path);
             $document->delete();
-            Storage::delete("{$this->path}/{$filename}");
 
             return $this->respond(['deleted' => true]);
         } catch (Exception $e) {

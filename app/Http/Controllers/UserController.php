@@ -179,10 +179,6 @@ class UserController extends ApiController
         try {
             $user = auth()->user();
 
-            if ($user->can('manage-account') || $user->can('manage-users')) {
-                return $this->respondBadRequest(null, 'Você não pode remover este membro.');
-            }
-
             $user->update($request->all());
 
             return $this->respond($this->transformItem($user, new UserTransformer()));
