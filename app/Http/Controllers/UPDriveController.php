@@ -229,6 +229,11 @@ class UPDriveController extends ApiController
         $limit = request('limit') ?: 25;
         $includes = ['contact', 'dispatch.user', 'dispatch.company', 'dispatch.documents'];
         $tracks = DocumentDispatchTracking::with($includes)
+            ->whereIn('id', function ($query) {
+                $query->select(DB::raw('max(id)'))
+                    ->from('documents_dispatch_tracking')
+                    ->groupBy('dispatch_id', 'contact_id');
+            })
             ->orderBy('created_at', 'DESC')
             ->paginate($limit);
 
@@ -237,7 +242,7 @@ class UPDriveController extends ApiController
             'items' => $this->transformCollection($tracks, new DocumentDispatchTrackingTransformer(), $includes)
         ]);
     }
-    
+
     /**
      * Parse the company to find is already exist,
      * creating a new one if necessary and than returning the object.

@@ -46,6 +46,28 @@ class WebhookController extends Controller
     }
 
     /**
+     * Tracking Opens.
+     */
+    public function trackingSpams()
+    {
+        if ($this->isTrackable()) {
+            $this->setupDatabase();
+            $this->track('spam');
+        }
+    }
+
+    /**
+     * Tracking Opens.
+     */
+    public function trackingBounces()
+    {
+        if ($this->isTrackable()) {
+            $this->setupDatabase();
+            $this->track('bounce');
+        }
+    }
+
+    /**
      * Check if is a trackable data.
      *
      * @return bool

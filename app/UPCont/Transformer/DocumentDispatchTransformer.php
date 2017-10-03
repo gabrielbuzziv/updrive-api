@@ -39,6 +39,7 @@ class DocumentDispatchTransformer extends TransformerAbstract
             'id'      => (int) $dispatch->id,
             'subject' => $dispatch->subject,
             'message' => $dispatch->message,
+            'created_at' => $dispatch->created_at->format('d/m/Y \à\s H:i')
         ];
     }
 
