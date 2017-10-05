@@ -169,7 +169,7 @@ class UPDriveController extends ApiController
             'company_id' => $company->id,
             'user_id'    => auth()->user()->id,
             'subject'    => $subject,
-            'message'    => $message,
+            'message'    => nl2br($message),
         ]);
 
         foreach ($documents as $document) {

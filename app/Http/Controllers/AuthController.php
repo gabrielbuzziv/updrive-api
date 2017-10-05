@@ -114,7 +114,7 @@ class AuthController extends ApiController
         if (! $token) {
             Log::warning('Não encontrou o token em tentativa de atualizar o token.');
 
-            return $this->respondBadRequest('Você foi desconectado por inatividade.');
+            return $this->respondBadRequest(null, 'Você foi desconectado por inatividade.');
         }
 
         try {
