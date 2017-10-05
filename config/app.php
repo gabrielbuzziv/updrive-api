@@ -182,7 +182,6 @@ return [
         Tymon\JWTAuth\Providers\LaravelServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
         Spatie\Fractal\FractalServiceProvider::class,
-        Barryvdh\Debugbar\ServiceProvider::class,
         Barryvdh\Cors\ServiceProvider::class,
         Barryvdh\DomPDF\ServiceProvider::class,
 
@@ -247,7 +246,6 @@ return [
         'JWTFactory'   => Tymon\JWTAuth\Facades\JWTFactory::class,
         'Image'        => Intervention\Image\Facades\Image::class,
         'Fractal'      => Spatie\Fractal\FractalFacade::class,
-        'Debugbar'     => Barryvdh\Debugbar\Facade::class,
         'PDF'          => Barryvdh\DomPDF\Facade::class,
     ],
 

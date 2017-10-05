@@ -72,7 +72,6 @@ class Handler extends ExceptionHandler
                     return $this->unauthenticated($request, $exception);
                 case $this->isHttpException($exception) :
                     $status = $exception->getStatusCode();
-//                    $response['errors'] = Response::$statusTexts[$status];
                     break;
                 default :
                     break;

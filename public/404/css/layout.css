@@ -1,0 +1,183 @@
+/*------------------------------------------------------------------
+[Included Compass CSS Authoring Framework - http://compass-style.org/]
+*/
+/*------------------------------------------------------------------
+[Table of contents]
+
+0.1 Fonts
+0.2 Color codes
+
+1.0 Base styles
+2.0 Main Header
+3.0 Header styles
+4.0 Footer styles
+5.0 Responsive styles
+
+-------------------------------------------------------------------*/
+/*------------------------------------------------------------------
+[0.1 Fonts]
+*/
+@import url("https://fonts.googleapis.com/css?family=Open+Sans:400,600,700&subset=latin-ext");
+/*------------------------------------------------------------------
+[0.2 Color codes]
+*/
+/*------------------------------------------------------------------
+[1.0 Base styles]
+*/
+body {
+  font-size: 20px;
+  color: #ffffff;
+  font-family: 'Open Sans', sans-serif;
+  background: #1989d1 url("../images/bg.jpg") no-repeat center top;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  -webkit-background-size: cover;
+  background-size: cover;
+}
+
+*:focus {
+  outline: none;
+  outline-color: #ffffff;
+}
+
+p {
+  font-size: 20px;
+  line-height: 30px;
+  margin-bottom: 20px;
+}
+
+a {
+  color: #ffffff;
+  -moz-transition: -moz-transform 0.8s ease-in-out;
+  -o-transition: -o-transform 0.8s ease-in-out;
+  -webkit-transition: -webkit-transform 0.8s ease-in-out;
+  transition: transform 0.8s ease-in-out;
+}
+a:hover, a:focus {
+  outline-color: #ffffff;
+  color: #ffffff;
+  text-decoration: none;
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=80);
+  opacity: 0.8;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0 0 20px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.container-fluid {
+  max-width: 990px;
+}
+
+/*------------------------------------------------------------------
+[2.0 Main styles]
+*/
+.dead-page {
+  text-align: center;
+  float: left;
+  width: 100%;
+  margin: 70px 0;
+}
+
+.illustration {
+  margin-bottom: 20px;
+}
+.illustration .img-responsive {
+  display: inline-block;
+}
+
+/*------------------------------------------------------------------
+[3.0 Header styles]
+*/
+header {
+  max-width: 490px;
+  display: inline-block;
+}
+header h1 {
+  font-size: 56px;
+  line-height: 62px;
+  font-weight: bold;
+}
+header h2 {
+  font-size: 28px;
+  font-weight: normal;
+  margin-bottom: 36px;
+}
+
+/*------------------------------------------------------------------
+[4.0 Footer styles]
+*/
+footer {
+  text-align: center;
+}
+footer ul {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+}
+footer ul li {
+  display: inline-block;
+  list-style: none;
+  width: 90px;
+  margin: 0 22px;
+}
+footer ul li img {
+  display: block;
+  margin-bottom: 10px;
+  -moz-transition: -moz-transform 0.8s ease-in-out;
+  -o-transition: -o-transform 0.8s ease-in-out;
+  -webkit-transition: -webkit-transform 0.8s ease-in-out;
+  transition: transform 0.8s ease-in-out;
+}
+footer ul li img:hover {
+  -moz-transform: rotate(360deg);
+  -ms-transform: rotate(360deg);
+  -webkit-transform: rotate(360deg);
+  transform: rotate(360deg);
+}
+footer ul li span {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/*------------------------------------------------------------------
+[5.0 Responsive styles]
+*/
+@media (max-width: 768px) {
+  .dead-page {
+    margin: 30px 0;
+  }
+
+  header h1 {
+    font-size: 33px;
+    line-height: 40px;
+    margin-bottom: 15px;
+  }
+  header h2 {
+    font-size: 20px;
+    line-height: 24px;
+    margin-bottom: 46px;
+  }
+
+  footer ul li {
+    width: 80px;
+    margin: 0 4px;
+  }
+  footer ul li img {
+    width: 80px;
+    margin-bottom: 10px;
+  }
+  footer ul li span {
+    font-size: 13px;
+  }
+}
