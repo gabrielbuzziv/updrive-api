@@ -13,4 +13,6 @@ class Notification extends Model
      * @var string
      */
     protected $connection = 'account';
+
+
 }

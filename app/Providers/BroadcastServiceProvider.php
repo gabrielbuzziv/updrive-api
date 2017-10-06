@@ -15,6 +15,10 @@ class BroadcastServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        Broadcast::channel('App.User.*', function ($user, $id) {
+            return (int) $user->id == (int) $id;
+        });
+
         Broadcast::routes(['middleware' => ['jwt.auth']]);
     }
 }

@@ -6,6 +6,7 @@ use App\Document;
 use App\Events\DocumentStatusUpdated;
 use App\Http\Controllers\Traits\Transformable;
 use App\Http\Requests\UploadDocumentRequest;
+use App\Notifications\DocumentOpenedNotification;
 use App\UPCont\Transformer\CompanyTransformer;
 use App\UPCont\Transformer\ContactTransformer;
 use App\UPCont\Transformer\DocumentTransformer;
@@ -68,11 +69,8 @@ class DocumentController extends ApiController
     public function destroy(Document $document)
     {
         try {
-            $filename = $document->filename;
-
-            $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);
-            Storage::disk('s3')->delete($path);
             $document->delete();
+            // Documents are not deleted from storage disk.
 
             return $this->respond(['deleted' => true]);
         } catch (Exception $e) {
@@ -143,6 +141,7 @@ class DocumentController extends ApiController
             $document->history()->create(['user_id' => Auth::user()->id, 'action' => 3]);
 
             event(new DocumentStatusUpdated($document));
+            auth()->user()->notify(new DocumentOpenedNotification($document, auth()->user()));
         }
 
         $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);
@@ -173,6 +172,7 @@ class DocumentController extends ApiController
             $document->history()->create(['user_id' => Auth::user()->id, 'action' => 4]);
 
             event(new DocumentStatusUpdated($document));
+            auth()->user()->notify(new DocumentOpenedNotification($document, auth()->user()));
         }
 
         $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);

@@ -9,7 +9,7 @@ class DatabaseNotification extends Model
 {
 
     /**
-     * The attribute set the database connection.
+     * Set database connection.
      *
      * @var string
      */
