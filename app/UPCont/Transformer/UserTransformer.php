@@ -70,6 +70,6 @@ class UserTransformer extends TransformerAbstract
      */
     public function includeNotifications(User $user)
     {
-        return $this->collection($user->unreadNotifications->toArray(), new NotificationTransformer());
+        return $this->collection($user->unreadNotifications, new NotificationTransformer());
     }
 }

@@ -3,6 +3,10 @@
 namespace App\Events;
 
 use App\Document;
+use App\Http\Controllers\Traits\Transformable;
+use App\UPCont\Transformer\ContactTransformer;
+use App\UPCont\Transformer\DocumentTransformer;
+use App\UPCont\Transformer\UserTransformer;
 use App\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -13,21 +17,29 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class DocumentOpened implements ShouldBroadcast
 {
-    use InteractsWithSockets, SerializesModels;
+
+    use InteractsWithSockets, SerializesModels, Transformable;
 
     /**
-     * Document
+     * Account
      *
-     * @var Document
+     * @var
      */
-    public $document;
+    public $account;
 
     /**
-     * Contact
+     * Type
      *
-     * @var User
+     * @var
      */
-    public $contact;
+    public $type;
+
+    /**
+     * Data
+     *
+     * @var
+     */
+    public $data;
 
     /**
      * Create a new event instance.
@@ -37,8 +49,13 @@ class DocumentOpened implements ShouldBroadcast
      */
     public function __construct(Document $document, User $contact)
     {
-        $this->document = $document;
-        $this->contact = $contact;
+        $this->account = config('account')->slug;
+        $this->type = 'DocumentOpened';
+        $this->data = [
+            'user'     => $this->transformItem($document->user, new UserTransformer()),
+            'document' => $this->transformItem($document, new DocumentTransformer()),
+            'contact'  => $this->transformItem($contact, new ContactTransformer())
+        ];
     }
 
     /**

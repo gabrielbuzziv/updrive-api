@@ -70,6 +70,7 @@ class DocumentController extends ApiController
     {
         try {
             $document->delete();
+
             // Documents are not deleted from storage disk.
 
             return $this->respond(['deleted' => true]);
@@ -133,7 +134,7 @@ class DocumentController extends ApiController
      */
     public function download(Document $document)
     {
-        if (!! auth()->user()->sharedDocuments->where('id', $document->id)->count()) {
+        if ( ! ! auth()->user()->sharedDocuments->where('id', $document->id)->count()) {
             $this->isAuthorized($document);
 
             $document->status = 3;
@@ -141,7 +142,7 @@ class DocumentController extends ApiController
             $document->history()->create(['user_id' => Auth::user()->id, 'action' => 3]);
 
             event(new DocumentStatusUpdated($document));
-            auth()->user()->notify(new DocumentOpenedNotification($document, auth()->user()));
+            $document->user->notify(new DocumentOpenedNotification($document, auth()->user()));
         }
 
         $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);
@@ -149,9 +150,9 @@ class DocumentController extends ApiController
         if (Storage::disk('s3')->exists($path)) {
             $file = Storage::disk('s3')->get($path);
             $headers = [
-                'Content-Type'        => Storage::disk('s3')->mimeType($path),
-                'Content-Description' => 'File Transfer',
-                'Content-Disposition' => "attachment; filename={$document->filename}",
+                'Content-Type'              => Storage::disk('s3')->mimeType($path),
+                'Content-Description'       => 'File Transfer',
+                'Content-Disposition'       => "attachment; filename={$document->filename}",
                 'Content-Transfer-Encoding' => 'binary',
             ];
 
@@ -165,14 +166,14 @@ class DocumentController extends ApiController
      */
     public function visualize(Document $document)
     {
-        if (!! auth()->user()->sharedDocuments->where('id', $document->id)->count()) {
+        if ( ! ! auth()->user()->sharedDocuments->where('id', $document->id)->count()) {
             $this->isAuthorized($document);
             $document->status = 3;
             $document->save();
             $document->history()->create(['user_id' => Auth::user()->id, 'action' => 4]);
 
             event(new DocumentStatusUpdated($document));
-            auth()->user()->notify(new DocumentOpenedNotification($document, auth()->user()));
+            $document->user->notify(new DocumentOpenedNotification($document, auth()->user()));
         }
 
         $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);

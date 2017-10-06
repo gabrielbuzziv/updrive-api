@@ -2,11 +2,16 @@
 
 namespace App\UPCont\Transformer;
 
+use App\Document;
+use App\Http\Controllers\Traits\Transformable;
+use App\User;
 use Carbon\Carbon;
 use League\Fractal\TransformerAbstract;
 
 class NotificationTransformer extends TransformerAbstract
 {
+
+    use Transformable;
 
     /**
      * The attribute set the default fields to include.
@@ -32,14 +37,25 @@ class NotificationTransformer extends TransformerAbstract
      * @param array $notification
      * @return array
      */
-    public function transform(array $notification)
+    public function transform($notification)
     {
-        $notification = (object) $notification;
-
         return [
+            'type' => $this->parseType($notification->type),
             'data' => $notification->data,
-            'read' => (bool) $notification->read_at,
-            'notified_at' => Carbon::createFromFormat('Y-m-d H:i:s', $notification->created_at)->diffForHumans(),
+            'read' => (bool) $notification->read_at
         ];
+    }
+
+    /**
+     * Parse notification Type
+     *
+     * @param $type
+     * @return mixed
+     */
+    private function parseType($type)
+    {
+        $type = explode('App\\Notifications\\', $type);
+
+        return str_replace('Notification', '', $type[1]);
     }
 }
