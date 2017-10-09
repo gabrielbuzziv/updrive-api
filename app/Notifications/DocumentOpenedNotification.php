@@ -12,7 +12,7 @@ use App\User;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Notifications\Notification;
 
-class DocumentOpenedNotification extends Notification implements ShouldBroadcast
+class DocumentOpenedNotification extends Notification
 {
 
     use Transformable;

@@ -142,7 +142,9 @@ class DocumentController extends ApiController
             $document->history()->create(['user_id' => Auth::user()->id, 'action' => 3]);
 
             event(new DocumentStatusUpdated($document));
-            $document->user->notify(new DocumentOpenedNotification($document, auth()->user()));
+            if ($document->user->notificationsSettings->contains('notification', 'document_opened')) {
+                $document->user->notify(new DocumentOpenedNotification($document, auth()->user()));
+            }
         }
 
         $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);
@@ -173,7 +175,10 @@ class DocumentController extends ApiController
             $document->history()->create(['user_id' => Auth::user()->id, 'action' => 4]);
 
             event(new DocumentStatusUpdated($document));
-            $document->user->notify(new DocumentOpenedNotification($document, auth()->user()));
+
+            if ($document->user->notificationsSettings->contains('notification', 'document_opened')) {
+                $document->user->notify(new DocumentOpenedNotification($document, auth()->user()));
+            }
         }
 
         $path = sprintf('%s/documents/%s', config('account')->slug, $document->filename);

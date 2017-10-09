@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Account;
 use App\Document;
+use App\Notifications\DocumentExpiredNotification;
 use App\Notifications\ExpiredDocumentsNotification;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -102,7 +103,10 @@ class CheckExpiredDocuments extends Command
 
             foreach ($this->notifications as $notification) {
                 $notification = (object) $notification;
-                $notification->user->notify(new ExpiredDocumentsNotification($notification));
+
+                if ($notification->user->notificationsSettings->contains('notification', 'document_expired')) {
+                    $notification->user->notify(new DocumentExpiredNotification($notification));
+                }
             }
 
             $this->info("Expired Documents check in account '{$account->name}' is complete.");
