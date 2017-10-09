@@ -6,6 +6,8 @@ use App\Account;
 use App\DocumentDispatch;
 use App\DocumentDispatchTracking;
 use App\Events\NewMailTracking;
+use App\Notifications\EmailDeliveredNotification;
+use App\Notifications\EmailOpenedNotification;
 use App\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -19,7 +21,7 @@ class WebhookController extends Controller
     {
         if ($this->isTrackable()) {
             $this->setupDatabase();
-            $this->track('delivered');
+            $this->track('delivered', 'email_delivered');
         }
     }
 
@@ -30,18 +32,7 @@ class WebhookController extends Controller
     {
         if ($this->isTrackable()) {
             $this->setupDatabase();
-            $this->track('opened');
-        }
-    }
-
-    /**
-     * Tracking Opens.
-     */
-    public function trackingOpens()
-    {
-        if ($this->isTrackable()) {
-            $this->setupDatabase();
-            $this->track('opened');
+            $this->track('opened', 'email_opened');
         }
     }
 
@@ -92,17 +83,29 @@ class WebhookController extends Controller
      * Track document.
      *
      * @param string $status
+     * @param string $notification
      */
-    private function track($status = 'sent')
+    private function track($status = 'sent', $notification = '')
     {
         $contactId = request()->get('contact');
         $dispatch = DocumentDispatch::find(request()->get('dispatch'));
 
-        $dispatch->contacts->each(function ($contact) use ($contactId, $dispatch, $status) {
+        $dispatch->contacts->each(function ($contact) use ($contactId, $dispatch, $status, $notification) {
             if ($contact->id == $contactId) {
                 $this->createTracking($dispatch, $contact, $status);
 
                 event(new NewMailTracking());
+
+                if (! empty($notification) && $dispatch->user->notificationsSettings->contains('notification', $notification)) {
+                    switch ($notification) {
+                        case 'email_delivered':
+                            $dispatch->user->notify(new EmailDeliveredNotification($dispatch, $contact));
+                            break;
+                        case 'email_opened':
+                            $dispatch->user->notify(new EmailOpenedNotification($dispatch, $contact));
+                            break;
+                    }
+                }
             }
         });
     }

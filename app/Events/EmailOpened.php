@@ -2,6 +2,11 @@
 
 namespace App\Events;
 
+use App\DocumentDispatch;
+use App\Http\Controllers\Traits\Transformable;
+use App\UPCont\Transformer\ContactTransformer;
+use App\UPCont\Transformer\UserTransformer;
+use App\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -9,18 +14,47 @@ use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class EmailOpened
+class EmailOpened implements ShouldBroadcast
 {
-    use InteractsWithSockets, SerializesModels;
+
+    use InteractsWithSockets, SerializesModels, Transformable;
+
+    /**
+     * Account
+     *
+     * @var
+     */
+    public $account;
+
+    /**
+     * Type
+     *
+     * @var
+     */
+    public $type;
+
+    /**
+     * Data
+     *
+     * @var
+     */
+    public $data;
 
     /**
      * Create a new event instance.
      *
-     * @return void
+     * @param DocumentDispatch $dispatch
+     * @param User $contact
      */
-    public function __construct()
+    public function __construct(DocumentDispatch $dispatch, User $contact)
     {
-        //
+        $this->account = config('account')->slug;
+        $this->type = 'EmailOpened';
+        $this->data = [
+            'subject' => $dispatch->subject,
+            'user'    => $this->transformItem($dispatch->user, new UserTransformer()),
+            'contact' => $this->transformItem($contact, new ContactTransformer()),
+        ];
     }
 
     /**
@@ -30,6 +64,6 @@ class EmailOpened
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('channel-name');
+        return new Channel('notifications');
     }
 }
