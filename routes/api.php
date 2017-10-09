@@ -41,6 +41,12 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::delete('users/{user}', 'UserController@revoke');
 
     /**
+     * UserSettingsController routes.
+     */
+    Route::get('users/settings/notifications', 'UserSettingsController@notifications');
+    Route::post('users/settings/notifications', 'UserSettingsController@toggleNotification');
+
+    /**
      * PermissionController routes
      */
     Route::get('permissions', 'PermissionController@index');

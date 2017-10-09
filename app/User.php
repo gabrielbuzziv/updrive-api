@@ -331,4 +331,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->belongsToMany(Document::class, 'document_contact', 'contact_id', 'document_id');
     }
+
+    /**
+     * A user has many user notifications.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function notificationsSettings()
+    {
+        return $this->hasMany(UserNotification::class);
+    }
 }

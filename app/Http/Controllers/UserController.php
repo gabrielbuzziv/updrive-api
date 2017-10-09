@@ -120,6 +120,9 @@ class UserController extends ApiController
             ->first();
         $registration->delete();
 
+        $user->notificationsSettings()->create(['notification' => 'document_opened']);
+        $user->notificationsSettings()->create(['notification' => 'document_expired']);
+
         return $this->respond($this->transformItem($user, new UserTransformer()));
     }
 
