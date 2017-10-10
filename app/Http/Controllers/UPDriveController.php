@@ -50,7 +50,7 @@ class UPDriveController extends ApiController
                 if (auth()->user()->is_contact && ! auth()->user()->is_user)
                     $query->where('company_contact.contact_id', auth()->user()->id);
             })
-            ->orderBy('identifier')
+            ->orderBy('name')
             ->paginate($limit);
 
         return $this->respond([
