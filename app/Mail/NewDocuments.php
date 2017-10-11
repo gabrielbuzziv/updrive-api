@@ -64,7 +64,7 @@ class NewDocuments extends Mailable
             ->subject("{$account->name}: {$this->dispatch->subject}")
             ->replyTo($this->dispatch->user->email)
             ->view('emails.default', [
-                'subject'       => $this->dispatch->subject,
+                'subject'       => "{$this->dispatch->company->name}: {$this->dispatch->subject}",
                 'description'   => $this->dispatch->message,
                 'documents'     => $this->transformCollection($this->dispatch->documents, new DocumentTransformer()),
                 'regards'       => [
