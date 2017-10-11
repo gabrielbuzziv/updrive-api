@@ -49,6 +49,7 @@ class DocumentTransformer extends TransformerAbstract
                 'download'  => action('DocumentController@download', [config('account')->slug, $document->id]),
                 'visualize' => action('DocumentController@visualize', [config('account')->slug, $document->id]),
             ],
+            'created_at' => $document->created_at->format('d/m/Y')
         ];
     }
 

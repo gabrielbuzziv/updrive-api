@@ -65,6 +65,39 @@ class Document extends Model
     protected $dates = ['deleted_at'];
 
     /**
+     * Scope pending documents.
+     *
+     * @param $query
+     * @return mixed
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 2);
+    }
+
+    /**
+     * Scope opened documents.
+     *
+     * @param $query
+     * @return mixed
+     */
+    public function scopeOpened($query)
+    {
+        return $query->whereIn('status', [3, 4]);
+    }
+
+    /**
+     * Scope expired documents.
+     *
+     * @param $query
+     * @return mixed
+     */
+    public function scopeExpired($query)
+    {
+        return $query->where('status', 5);
+    }
+
+    /**
      * Set the cycle data as null if the sent value is empty,
      * but if is filled transform in to a Carbon instance.
      *
