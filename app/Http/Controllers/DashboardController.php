@@ -54,17 +54,22 @@ class DashboardController extends ApiController
 
         switch ($interval) {
             case 'week':
-                $interval = 7;
-                $documents = $this->getDocumentsFromDaysAgo($interval);
+                $time = 7;
+                $documents = $this->getDocumentsFromDaysAgo($time);
                 break;
             case 'month':
-                $interval = 30;
-                $documents = $this->getDocumentsFromDaysAgo($interval);
+                $time = 30;
+                $documents = $this->getDocumentsFromDaysAgo($time);
+                break;
+            case 'year':
+                $time = 12;
+                $documents = $documents = $this->getDocumentsFromMonthsAgo($time);
                 break;
         }
 
-        for ($i = $interval; $i > 0; $i --) {
-            $period = Carbon::today()->subDays($i - 1)->format('d/m/Y');
+        for ($i = $time; $i > 0; $i --) {
+            $period = $interval == 'year' ? Carbon::today()->subMonths($i - 1)->format('m/Y') : Carbon::today()->subDays($i - 1)->format('d/m/Y');
+
             $labels[] = $period;
             $data['sent']['data'][$period] = 0;
             $data['opened']['data'][$period] = 0;
@@ -103,7 +108,7 @@ class DashboardController extends ApiController
         return $this->respond([
             'labels' => $labels,
             'data'   => array_values($data),
-            'sent' => $sent,
+            'sent'   => $sent,
             'opened' => $opened,
         ]);
     }
@@ -126,8 +131,7 @@ class DashboardController extends ApiController
      *
      * @return mixed
      */
-    public
-    function getMetrics()
+    public function getMetrics()
     {
         return $this->respond([
             'companies' => Company::count(),
@@ -142,16 +146,42 @@ class DashboardController extends ApiController
      * @param $days
      * @return mixed
      */
-    private
-    function getDocumentsFromDaysAgo($days)
+    private function getDocumentsFromDaysAgo($days)
     {
         $start = Carbon::today()->subDays($days)->format('Y-m-d');
         $end = Carbon::today()->format('Y-m-d');
 
-        return DocumentHistory::select(DB::raw('COUNT(document_id) as amount, DATE_FORMAT(created_at, "%d/%m/%Y") as date, action'))
-            ->whereIn('action', [2, 3, 4])
-            ->whereBetween('created_at', [$start, $end])
-            ->groupBy(DB::raw('DATE_FORMAT(created_at, "%Y%m%d")'), 'action')
+        return (new DocumentHistory())
+            ->select(
+                DB::raw('COUNT(documents_history.document_id) as amount, DATE_FORMAT(documents_history.created_at, "%d/%m/%Y") as date, documents_history.action')
+            )
+            ->join('documents', 'documents.id', 'documents_history.document_id')
+            ->whereIn('documents_history.action', [2, 3, 4])
+            ->whereBetween('documents_history.created_at', [$start, $end])
+            ->groupBy(DB::raw('DATE_FORMAT(documents_history.created_at, "%Y%m%d")'), 'documents_history.action')
+            ->get();
+    }
+
+    /**
+     * Fetch the documents history $months before today.
+     *
+     * @param $months
+     * @return mixed
+     */
+    private function getDocumentsFromMonthsAgo($months)
+    {
+        $start = Carbon::today()->subMonths($months - 1)->startOfMonth()->format('Y-m-d');
+        $end = Carbon::today()->endOfMonth()->format('Y-m-d');
+
+        return (new DocumentHistory)
+            ->select(
+                DB::raw('COUNT(documents_history.document_id) as amount, DATE_FORMAT(documents_history.created_at, "%m/%Y") as date, documents_history.action')
+            )
+            ->join('documents', 'documents.id', 'documents_history.document_id')
+            ->whereNull('documents.deleted_at')
+            ->whereIn('documents_history.action', [2, 3, 4])
+            ->whereBetween('documents_history.created_at', [$start, $end])
+            ->groupBy(DB::raw('DATE_FORMAT(documents_history.created_at, "%Y%m")'), 'documents_history.action')
             ->get();
     }
 
