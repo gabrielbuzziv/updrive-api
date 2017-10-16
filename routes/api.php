@@ -112,5 +112,17 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('updrive/amounts', 'UPDriveController@amounts');
     Route::post('updrive/send', 'UPDriveController@send');
 
+    /**
+     * AccountController routes
+     */
     Route::get('account', 'AccountController@show');
+
+    /**
+     * DashboardController routes
+     */
+    Route::get('dashboard/overview', 'DashboardController@getOverview');
+    Route::get('dashboard/pending-documents', 'DashboardController@getPendingDocuments');
+    Route::get('dashboard/metrics', 'DashboardController@getMetrics');
+
+
 });

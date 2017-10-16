@@ -24,7 +24,7 @@ class CompanyController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-companies');
+        $this->middleware('permission:manage-core');
     }
 
     /**

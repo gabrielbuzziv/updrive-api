@@ -32,7 +32,7 @@ class UPDriveController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-updrive', ['only' => 'send']);
+        $this->middleware('permission:manage-core', ['only' => 'send']);
     }
 
     /**
@@ -47,7 +47,7 @@ class UPDriveController extends ApiController
             ->search(request('filter'), null, true, true)
             ->leftJoin('company_contact', 'company_contact.company_id', 'companies.id')
             ->where(function ($query) {
-                if (auth()->user()->is_contact && ! auth()->user()->is_user)
+                if (! auth()->user()->can('manage-core'))
                     $query->where('company_contact.contact_id', auth()->user()->id);
             })
             ->orderBy('name')
@@ -75,7 +75,7 @@ class UPDriveController extends ApiController
                 if (request('company'))
                     $query->where('documents.company_id', request('company'));
 
-                if (auth()->user()->is_contact && ! auth()->user()->is_user) {
+                if (! auth()->user()->can('manage-core')) {
                     $query->where('document_contact.contact_id', auth()->user()->id);
                     $query->where('company_contact.contact_id', auth()->user()->id);
                 }
@@ -110,7 +110,7 @@ class UPDriveController extends ApiController
                 if (request('company'))
                     $query->where('documents.company_id', request('company'));
 
-                if (auth()->user()->is_contact && ! auth()->user()->is_user) {
+                if (! auth()->user()->can('manage-core')) {
                     $query->where('document_contact.contact_id', auth()->user()->id);
                     $query->where('company_contact.contact_id', auth()->user()->id);
                 }
@@ -338,7 +338,7 @@ class UPDriveController extends ApiController
             ->join('company_contact', 'company_contact.company_id', 'documents.company_id')
             ->join('document_contact', 'document_contact.document_id', 'documents.id')
             ->where(function ($query) {
-                if (auth()->user()->is_contact && ! auth()->user()->is_user) {
+                if (! auth()->user()->can('manage-core')) {
                     $query->where('document_contact.contact_id', auth()->user()->id);
                     $query->where('company_contact.contact_id', auth()->user()->id);
                 }

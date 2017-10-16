@@ -27,7 +27,7 @@ class ContactController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-contacts', ['except' => ['companies', 'checkForNewDocuments']]);
+        $this->middleware('permission:manage-core', ['except' => ['companies', 'checkForNewDocuments']]);
     }
 
     /**

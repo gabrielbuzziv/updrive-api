@@ -14,7 +14,7 @@ class CompanyRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->can('manage-companies');
+        return Auth::user()->can('manage-core');
     }
 
     /**

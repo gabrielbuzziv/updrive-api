@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Account;
 use App\Http\Controllers\Traits\Transformable;
 use App\UPCont\Transformer\AccountTransformer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AccountController extends ApiController
 {
@@ -16,7 +18,7 @@ class AccountController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-account');
+        $this->middleware('permission:manage-account', ['except' => 'show']);
     }
 
     /**
@@ -28,6 +30,6 @@ class AccountController extends ApiController
     {
         $account = config('account');
 
-        return $this->respond($this->transformItem($account, new AccountTransformer()));
+        return $this->respond($this->transformItem($account, new AccountTransformer(), ['settings']));
     }
 }

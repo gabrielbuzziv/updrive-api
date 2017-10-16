@@ -35,7 +35,7 @@ class DocumentController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-updrive', ['only' => ['update', 'destroy']]);
+        $this->middleware('permission:manage-core', ['only' => ['update', 'destroy']]);
     }
 
     /**

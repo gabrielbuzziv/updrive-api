@@ -15,7 +15,7 @@ class ContactRequest extends FormRequest
      */
     public function authorize()
     {
-        return Auth::user()->can('manage-contacts');
+        return Auth::user()->can('manage-core');
     }
 
     /**
