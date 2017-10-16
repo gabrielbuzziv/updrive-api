@@ -120,6 +120,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     /**
      * DashboardController routes
      */
+    Route::get('dashboard/overview', 'DashboardController@getOverview');
     Route::get('dashboard/pending-documents', 'DashboardController@getPendingDocuments');
     Route::get('dashboard/metrics', 'DashboardController@getMetrics');
 

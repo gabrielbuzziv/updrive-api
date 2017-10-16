@@ -9,6 +9,24 @@ class AccountTransformer extends TransformerAbstract
 {
 
     /**
+     * The attribute set the default fields to include.
+     *
+     * @var array
+     */
+    protected $defaultIncludes = [
+        //
+    ];
+
+    /**
+     * The attribute set the available fields to include.
+     *
+     * @var array
+     */
+    protected $availableIncludes = [
+        'settings',
+    ];
+
+    /**
      * A Fractal transformer.
      *
      * @param Account $account
@@ -32,5 +50,16 @@ class AccountTransformer extends TransformerAbstract
                 'state'      => '',
             ],
         ];
+    }
+
+    /**
+     * Include account settings to the transform.
+     *
+     * @param Account $account
+     * @return \League\Fractal\Resource\Collection
+     */
+    public function includeSettings(Account $account)
+    {
+        return $this->collection($account->settings, new AccountSettingTransformer());
     }
 }

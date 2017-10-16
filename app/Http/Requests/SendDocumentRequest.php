@@ -14,7 +14,7 @@ class SendDocumentRequest extends FormRequest
      */
     public function authorize()
     {
-        return auth()->user()->can('manage-updrive');
+        return auth()->user()->can('manage-core');
     }
 
     /**

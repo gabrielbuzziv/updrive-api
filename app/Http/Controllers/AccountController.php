@@ -16,7 +16,7 @@ class AccountController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-account');
+        $this->middleware('permission:manage-account', ['except' => 'show']);
     }
 
     /**
@@ -28,6 +28,6 @@ class AccountController extends ApiController
     {
         $account = config('account');
 
-        return $this->respond($this->transformItem($account, new AccountTransformer()));
+        return $this->respond($this->transformItem($account, new AccountTransformer(), ['settings']));
     }
 }

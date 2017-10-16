@@ -37,6 +37,28 @@ class DocumentHistory extends Model
      * @var array
      */
     protected $hidden = ['updated_at'];
+
+    /**
+     * Scope sent documents.
+     *
+     * @param $query
+     * @return mixed
+     */
+    public function scopeSent($query)
+    {
+        return $query->where('action', 2);
+    }
+
+    /**
+     * Scope opened documents.
+     *
+     * @param $query
+     * @return mixed
+     */
+    public function scopeOpened($query)
+    {
+        return $query->whereIn('action', [3, 4]);
+    }
     
     /**
      * A history belongs to a user.

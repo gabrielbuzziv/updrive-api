@@ -32,7 +32,7 @@ class UPDriveController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-updrive', ['only' => 'send']);
+        $this->middleware('permission:manage-core', ['only' => 'send']);
     }
 
     /**

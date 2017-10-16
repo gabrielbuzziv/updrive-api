@@ -23,9 +23,9 @@ class InstallationSeeder extends Seeder
     {
         $permissions = [
             ['name' => 'manage-users', 'display_name' => 'Gerenciar Usuários', 'description' => ''],
-            ['name' => 'manage-companies', 'display_name' => 'Gerenciar Empresas', 'description' => ''],
-            ['name' => 'manage-contacts', 'display_name' => 'Gerenciar Contatos', 'description' => ''],
-            ['name' => 'manage-updrive', 'display_name' => 'Gerenciar Documentos', 'description' => ''],
+            ['name' => 'manage-core', 'display_name' => 'Gerenciar Empresas', 'description' => ''],
+            ['name' => 'manage-core', 'display_name' => 'Gerenciar Contatos', 'description' => ''],
+            ['name' => 'manage-core', 'display_name' => 'Gerenciar Documentos', 'description' => ''],
         ];
 
         array_walk($permissions, function ($permission) {
@@ -44,7 +44,7 @@ class InstallationSeeder extends Seeder
             'password' => 'gabriel',
         ]);
 
-        $permissions = ['manage-users', 'manage-companies', 'manage-contacts', 'manage-updrive'];
+        $permissions = ['manage-users', 'manage-core', 'manage-core', 'manage-core'];
         $permissions = \App\Permission::whereIn('name', $permissions)->pluck('id')->all();
 
         $user->perms()->sync($permissions);
