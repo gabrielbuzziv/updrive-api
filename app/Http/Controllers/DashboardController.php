@@ -22,7 +22,7 @@ class DashboardController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage_core');
+        $this->middleware('permission:manage-core');
     }
 
     /**

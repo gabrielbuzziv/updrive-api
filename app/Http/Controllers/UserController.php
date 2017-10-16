@@ -48,6 +48,8 @@ class UserController extends ApiController
     }
 
     /**
+     * Add user as pending and sent invitation mail to register his data.
+     *
      * @param UserRequest $request
      */
     public function add(UserRequest $request)
