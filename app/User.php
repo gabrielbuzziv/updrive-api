@@ -341,4 +341,14 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(UserNotification::class);
     }
+
+    /**
+     * User belongs to many tags.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function contacts()
+    {
+        return $this->belongsToMany(Tag::class, 'contact_tag', 'contact_id', 'tag_id');
+    }
 }
