@@ -89,7 +89,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::patch('contacts/{contact}', 'ContactController@update');
     Route::delete('contacts', 'ContactController@destroy');
 
-
     /**
      * DocumentController routes.
      */
@@ -124,5 +123,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('dashboard/pending-documents', 'DashboardController@getPendingDocuments');
     Route::get('dashboard/metrics', 'DashboardController@getMetrics');
 
-
+    /**
+     * TagController routes.
+     */
+    Route::get('tags', 'TagController@index');
 });

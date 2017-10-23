@@ -162,7 +162,7 @@ class CompanyController extends ApiController
 
     /**
      * Import companies from csv file to database.
-     * 
+     *
      * @return mixed
      */
     public function import()
@@ -171,7 +171,7 @@ class CompanyController extends ApiController
 
         foreach ($this->parseImport() as $company) {
             $data = [
-                'identifier'     => isset($company[0]) && ! empty($company[0])  ? $company[0] : null,
+                'identifier'     => isset($company[0]) && ! empty($company[0]) ? $company[0] : null,
                 'name'           => isset($company[1]) && ! empty($company[1]) ? $company[1] : null,
                 'nickname'       => isset($company[2]) && ! empty($company[2]) ? $company[2] : null,
                 'email'          => isset($company[3]) && ! empty($company[3]) ? $company[3] : null,
@@ -209,11 +209,13 @@ class CompanyController extends ApiController
     public function contacts(Company $company)
     {
         $query = request('query');
-        $contacts = $company->contacts()->search($query)->get();
+        $includes = ['tags'];
+        $contacts = $company->contacts()
+            ->with($includes)
+            ->search($query)
+            ->get();
 
-        return $this->respond([
-            'items' => $this->transformCollection($contacts, new ContactTransformer()),
-        ]);
+        return $this->respond(['items' => $this->transformCollection($contacts, new ContactTransformer(), $includes)]);
     }
 
     /**
@@ -309,7 +311,7 @@ class CompanyController extends ApiController
 
     /**
      * Validate if import sheet header is right.
-     * 
+     *
      * @param $header
      */
     private function validateImportSheet($header)

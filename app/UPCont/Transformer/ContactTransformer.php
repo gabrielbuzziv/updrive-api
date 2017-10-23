@@ -23,7 +23,7 @@ class ContactTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'address', 'phones', 'roles', 'companies'
+        'address', 'phones', 'roles', 'companies', 'tags'
     ];
 
     /**
@@ -46,6 +46,19 @@ class ContactTransformer extends TransformerAbstract
                 'gravatar' => sprintf('%s%s', $gravatarUrl, md5(strtolower($contact->email)))
             ]
         ];
+    }
+
+    /**
+     * Include tags to the transform.
+     *
+     * @param User $contact
+     * @return \League\Fractal\Resource\Collection
+     */
+    public function includeTags(User $contact)
+    {
+        if ($contact->tags) {
+            return $this->collection($contact->tags, new TagTransformer());
+        }
     }
 
     /**
