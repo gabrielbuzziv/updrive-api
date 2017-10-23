@@ -8,6 +8,13 @@ class Tag extends Model
 {
 
     /**
+     * Database connection.
+     *
+     * @var string
+     */
+    protected $connection = 'account';
+
+    /**
      * Attributes that can be asign.
      *
      * @var array

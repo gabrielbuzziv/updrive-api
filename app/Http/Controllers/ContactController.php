@@ -38,14 +38,16 @@ class ContactController extends ApiController
     public function index()
     {
         $limit = request('limit') ?: 25;
-        $contacts = User::contact()
+        $includes = ['tags'];
+        $contacts = User::with($includes)
+            ->contact()
             ->search(request('filter'), null, true, true)
             ->orderBy('name')
             ->paginate($limit);
 
         return $this->respond([
             'total' => $contacts->total(),
-            'items' => $this->transformCollection($contacts, new ContactTransformer()),
+            'items' => $this->transformCollection($contacts, new ContactTransformer(), $includes),
         ]);
     }
 
@@ -65,7 +67,7 @@ class ContactController extends ApiController
 
             $contact = User::firstOrCreate(['email' => $data['email']], $data);
 
-            if (! $contact->wasRecentlyCreated) {
+            if ( ! $contact->wasRecentlyCreated) {
                 $contact->name = ! empty($data['name']) ? $data['name'] : $contact->name;
                 $contact->is_contact = true;
                 $contact->save();
@@ -302,7 +304,7 @@ class ContactController extends ApiController
                 'is_active'  => true,
             ]);
 
-            if (! $company->contacts->contains($contact->id)) {
+            if ( ! $company->contacts->contains($contact->id)) {
                 $company->contacts()->attach($contact->id);
             }
 

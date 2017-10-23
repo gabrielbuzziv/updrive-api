@@ -270,12 +270,21 @@ class UPDriveController extends ApiController
     private function parseContacts($contacts)
     {
         return array_map(function ($contact) {
-            switch ($contact) {
-                case is_numeric($contact) :
-                    return User::find((int) $contact);
-                case is_string($contact) :
-                    return User::firstOrCreate(['email' => $contact], ['name' => $contact, 'password' => str_random(8), 'is_contact' => true, 'is_active' => true]);
+            $user = null;
+            $value = $contact['value'];
+
+            switch ($value) {
+                case is_numeric($value) :
+                    $user = User::find((int) $value);
+                    break;
+                case is_string($value) :
+                    $user = User::firstOrCreate(['email' => $value], ['name' => $value, 'password' => str_random(8), 'is_contact' => true, 'is_active' => true]);
+                    break;
             }
+
+            $user->tags()->sync($contact['tags']);
+
+            return $user;
         }, $contacts);
     }
 

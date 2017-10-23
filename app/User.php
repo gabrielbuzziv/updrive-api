@@ -347,7 +347,7 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function contacts()
+    public function tags()
     {
         return $this->belongsToMany(Tag::class, 'contact_tag', 'contact_id', 'tag_id');
     }
