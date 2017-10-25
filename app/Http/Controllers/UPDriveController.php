@@ -98,25 +98,6 @@ class UPDriveController extends ApiController
     }
 
     /**
-     * Count unnotified documents from requested company
-     *
-     * @return mixed
-     */
-    public function amounts()
-    {
-        $pendings = $this->getDocumentsByCompany()->whereNotNull('validity')
-            ->where('documents.status', 2)
-            ->whereDate('documents.validity', '>=', Carbon::now()->format('Y-m-d'))
-            ->count(DB::raw('DISTINCT documents.id'));
-        $documents = $this->getDocumentsByCompany()->where('documents.status', 2)->count(DB::raw('DISTINCT documents.id'));
-
-        return $this->respond([
-            'pendings'  => $pendings,
-            'documents' => $documents,
-        ]);
-    }
-
-    /**
      * Create the document Dispatch and fill with the requested data.
      * Notify the contacts, Create the Document, Add History to Document and share with contacts.
      *
@@ -289,26 +270,5 @@ class UPDriveController extends ApiController
         }
 
         return false;
-    }
-
-    /**
-     * Get documets by company.
-     *
-     * @return mixed
-     */
-    private function getDocumentsByCompany()
-    {
-        return Document::select('documents.*')
-            ->join('company_contact', 'company_contact.company_id', 'documents.company_id')
-            ->join('document_contact', 'document_contact.document_id', 'documents.id')
-            ->where(function ($query) {
-                if (! auth()->user()->can('manage-core')) {
-                    $query->where('document_contact.contact_id', auth()->user()->id);
-                    $query->where('company_contact.contact_id', auth()->user()->id);
-                }
-
-                if (request('company'))
-                    $query->where('documents.company_id', request('company'));
-            });
     }
 }
