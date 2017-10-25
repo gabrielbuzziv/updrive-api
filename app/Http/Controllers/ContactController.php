@@ -211,7 +211,10 @@ class ContactController extends ApiController
             ];
 
             $contact = User::firstOrCreate(['email' => $data['email']], $data);
-            $contact->phones()->firstOrCreate(['number' => $data['phone']], ['number' => $data['phone'], 'type' => 0]);
+
+            if ($data['phone'] != null)
+                $contact->phones()->firstOrCreate(['number' => $data['phone']], ['number' => $data['phone'], 'type' => 0]);
+
             $contact->address()->update($address);
 
             $contacts[] = $contact;

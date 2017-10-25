@@ -58,6 +58,17 @@ class WebhookController extends Controller
         }
     }
 
+    public function trackingDropped()
+    {
+        if ($this->isTrackable()) {
+            $this->setupDatabase();
+            $this->track('dropped');
+        }
+
+        Log::useDailyFiles(storage_path().'/logs/tracking-dropped.log');
+        Log::info(request()->all());
+    }
+
     /**
      * Check if is a trackable data.
      *
@@ -93,8 +104,6 @@ class WebhookController extends Controller
         $dispatch->contacts->each(function ($contact) use ($contactId, $dispatch, $status, $notification) {
             if ($contact->id == $contactId) {
                 $this->createTracking($dispatch, $contact, $status);
-
-                event(new NewMailTracking());
 
                 if (! empty($notification) && $dispatch->user->notificationsSettings->contains('notification', $notification)) {
                     switch ($notification) {

@@ -14,5 +14,6 @@ class VerifyCsrfToken extends BaseVerifier
     protected $except = [
         'webhook/tracking-deliveries',
         'webhook/tracking-opened',
+        'webhook/tracking-dropped',
     ];
 }
