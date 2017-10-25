@@ -104,7 +104,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     /**
      * UPDriveController routes.
      */
-    Route::get('updrive/tracking', 'UPDriveController@tracking');
+    Route::get('updrive/{dispatch}/document-dispatch', 'UPDriveController@dispatchDetails');
     Route::get('updrive/companies', 'UPDriveController@companies');
     Route::get('updrive/pending', 'UPDriveController@pending');
     Route::get('updrive/documents', 'UPDriveController@documents');
@@ -127,4 +127,5 @@ Route::group(['middleware' => 'auth:api'], function () {
      * TagController routes.
      */
     Route::get('tags', 'TagController@index');
+    Route::post('tags', 'TagController@create');
 });

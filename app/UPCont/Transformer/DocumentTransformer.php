@@ -25,7 +25,7 @@ class DocumentTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'history', 'user', 'company', 'sharedWith'
+        'history', 'user', 'company', 'sharedWith', 'dispatch'
     ];
 
     /**
@@ -51,6 +51,19 @@ class DocumentTransformer extends TransformerAbstract
             ],
             'created_at' => $document->created_at->format('d/m/Y')
         ];
+    }
+
+    /**
+     * Include dispatch transformer.
+     *
+     * @param Document $document
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeDispatch(Document $document)
+    {
+        if ($document->dispatch) {
+            return $this->item($document->dispatch, new DocumentDispatchTransformer());
+        }
     }
 
     /**

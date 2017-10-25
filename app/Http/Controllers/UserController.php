@@ -27,7 +27,7 @@ class UserController extends ApiController
      */
     public function __construct()
     {
-        $this->middleware('permission:manage-users', ['except' => 'register']);
+        $this->middleware('permission:manage-users', ['except' => ['register', 'updateProfile', 'updatePassword']]);
     }
 
     /**

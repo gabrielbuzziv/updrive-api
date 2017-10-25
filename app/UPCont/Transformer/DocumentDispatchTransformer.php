@@ -24,7 +24,7 @@ class DocumentDispatchTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'user', 'company', 'contacts', 'documents'
+        'user', 'company', 'contacts', 'documents', 'tracking'
     ];
 
     /**
@@ -41,6 +41,17 @@ class DocumentDispatchTransformer extends TransformerAbstract
             'message' => $dispatch->message,
             'created_at' => $dispatch->created_at->format('d/m/Y \à\s H:i')
         ];
+    }
+
+    /**
+     * Include tracking transformer.
+     *
+     * @param DocumentDispatch $dispatch
+     * @return \League\Fractal\Resource\Item
+     */
+    public function includeTracking(DocumentDispatch $dispatch)
+    {
+        return $this->collection($dispatch->tracking, new DocumentDispatchTrackingTransformer());
     }
 
     /**

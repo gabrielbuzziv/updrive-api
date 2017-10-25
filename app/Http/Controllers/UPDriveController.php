@@ -14,6 +14,7 @@ use App\Mail\NewDocuments;
 use App\Notifications\NewDocumentsNotification;
 use App\UPCont\Transformer\CompanyTransformer;
 use App\UPCont\Transformer\DocumentDispatchTrackingTransformer;
+use App\UPCont\Transformer\DocumentDispatchTransformer;
 use App\UPCont\Transformer\DocumentTransformer;
 use App\UPCont\Transformer\FolderTransformer;
 use App\User;
@@ -44,50 +45,16 @@ class UPDriveController extends ApiController
     {
         $limit = request('limit') ?: 25;
         $companies = Company::select(DB::raw('DISTINCT companies.*'))
-            ->search(request('filter'), null, true, true)
+            ->search(request('filter'), null, true)
             ->leftJoin('company_contact', 'company_contact.company_id', 'companies.id')
             ->where(function ($query) {
                 if (! auth()->user()->can('manage-core'))
                     $query->where('company_contact.contact_id', auth()->user()->id);
             })
-            ->orderBy('name')
             ->paginate($limit);
 
         return $this->respond([
             'items' => $this->transformCollection($companies, new CompanyTransformer()),
-        ]);
-    }
-
-    /**
-     * Get pending documents.
-     * Documents that was not opened and have validity.
-     *
-     * @return mixed
-     */
-    public function pending()
-    {
-        $include = ['company', 'user', 'history'];
-        $documents = Document::select(DB::raw('DISTINCT documents.*'))
-            ->with($include)
-            ->leftJoin('company_contact', 'company_contact.company_id', 'documents.company_id')
-            ->leftJoin('document_contact', 'document_contact.document_id', 'documents.id')
-            ->where(function ($query) {
-                if (request('company'))
-                    $query->where('documents.company_id', request('company'));
-
-                if (! auth()->user()->can('manage-core')) {
-                    $query->where('document_contact.contact_id', auth()->user()->id);
-                    $query->where('company_contact.contact_id', auth()->user()->id);
-                }
-
-                $query->whereNotNull('documents.validity');
-                $query->where('documents.status', 2);
-                $query->whereDate('documents.validity', '>=', Carbon::now()->format('Y-m-d'));
-            })
-            ->orderBy('documents.validity', 'ASC')->get();
-
-        return $this->respond([
-            'items' => $this->transformCollection($documents, new DocumentTransformer(), $include),
         ]);
     }
 
@@ -100,7 +67,7 @@ class UPDriveController extends ApiController
     {
         $query = request('query');
         $limit = request('limit') ?: 25;
-        $include = ['company', 'user', 'history.user'];
+        $include = ['company', 'user', 'sharedWith', 'history.user', 'dispatch.tracking.contact'];
         $documents = Document::select(DB::raw('DISTINCT documents.*'))
             ->with($include)
             ->leftJoin('company_contact', 'company_contact.company_id', 'documents.company_id')
@@ -219,28 +186,15 @@ class UPDriveController extends ApiController
         ]);
     }
 
-    /**
-     * Get dispatchs tracking.
+    /*
+     * Get document dispatch details.
      *
+     * @param DocumentDispatch $dispatch
      * @return mixed
      */
-    public function tracking()
+    public function dispatchDetails(DocumentDispatch $dispatch)
     {
-        $limit = request('limit') ?: 25;
-        $includes = ['contact', 'dispatch.user', 'dispatch.company', 'dispatch.documents'];
-        $tracks = DocumentDispatchTracking::with($includes)
-            ->whereIn('id', function ($query) {
-                $query->select(DB::raw('max(id)'))
-                    ->from('documents_dispatch_tracking')
-                    ->groupBy('dispatch_id', 'contact_id');
-            })
-            ->orderBy('created_at', 'DESC')
-            ->paginate($limit);
-
-        return $this->respond([
-            'total' => $tracks->total(),
-            'items' => $this->transformCollection($tracks, new DocumentDispatchTrackingTransformer(), $includes)
-        ]);
+        return $this->respond($this->transformItem($dispatch, new DocumentDispatchTransformer()));
     }
 
     /**
@@ -282,7 +236,8 @@ class UPDriveController extends ApiController
                     break;
             }
 
-            $user->tags()->sync($contact['tags']);
+            if (isset($contact['tags']))
+                $user->tags()->sync($contact['tags']);
 
             return $user;
         }, $contacts);

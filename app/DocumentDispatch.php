@@ -75,6 +75,6 @@ class DocumentDispatch extends Model
      */
     public function tracking()
     {
-        return $this->hasMany(DocumentDispatchTracking::class);
+        return $this->hasMany(DocumentDispatchTracking::class, 'dispatch_id');
     }
 }
