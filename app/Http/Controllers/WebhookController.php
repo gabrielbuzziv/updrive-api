@@ -105,6 +105,8 @@ class WebhookController extends Controller
             if ($contact->id == $contactId) {
                 $this->createTracking($dispatch, $contact, $status);
 
+                event(new NewMailTracking());
+
                 if (! empty($notification) && $dispatch->user->notificationsSettings->contains('notification', $notification)) {
                     switch ($notification) {
                         case 'email_delivered':
