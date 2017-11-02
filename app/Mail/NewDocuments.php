@@ -60,8 +60,8 @@ class NewDocuments extends Mailable
     {
         $account = config('account');
 
-        $this->from(env('MAIL_FROM_ADDRESS'), $this->dispatch->user->name)
-            ->subject("{$account->name}: {$this->dispatch->subject}")
+        $this->from(env('MAIL_FROM_ADDRESS'), $account->name)
+            ->subject("{$this->dispatch->subject}")
             ->replyTo($this->dispatch->user->email)
             ->view('emails.default', [
                 'subject'       => "{$this->dispatch->company->name}: {$this->dispatch->subject}",
