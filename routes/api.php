@@ -127,4 +127,9 @@ Route::group(['middleware' => 'auth:api'], function () {
      */
     Route::get('tags', 'TagController@index');
     Route::post('tags', 'TagController@create');
+
+    /**
+     * ReportController routes.
+     */
+    Route::get('reports/sent', 'ReportController@sent');
 });

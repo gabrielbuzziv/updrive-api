@@ -176,24 +176,20 @@ class Document extends Model
     {
         switch ($value) {
             case 1:
+            case 2:
                 return [
                     'id'    => $value,
                     'name'  => 'Pendente',
                     'label' => 'label-warning',
                 ];
-            case 2:
-                return [
-                    'id'    => $value,
-                    'name'  => 'Novo',
-                    'label' => 'label-new',
-                ];
             case 3:
+            case 4:
                 return [
                     'id'    => $value,
-                    'name'  => 'Visualizado',
-                    'label' => 'label-primary',
+                    'name'  => 'Aberto',
+                    'label' => 'label-success',
                 ];
-            case 4:
+            case 5:
                 return [
                     'id'    => $value,
                     'name'  => 'Vencido',
