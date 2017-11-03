@@ -48,7 +48,7 @@ class WebhookController extends Controller
     }
 
     /**
-     * Tracking Opens.
+     * Tracking Bounces.
      */
     public function trackingBounces()
     {
@@ -58,12 +58,15 @@ class WebhookController extends Controller
         }
     }
 
+    /**
+     * Tracking Dropped.
+     */
     public function trackingDropped()
     {
-        if ($this->isTrackable()) {
-            $this->setupDatabase();
-            $this->track('dropped');
-        }
+//        if ($this->isTrackable()) {
+//            $this->setupDatabase();
+//            $this->track('dropped');
+//        }
 
         Log::useDailyFiles(storage_path().'/logs/tracking-dropped.log');
         Log::info(request()->all());

@@ -59,12 +59,14 @@ class NewDocuments extends Mailable
     public function build()
     {
         $account = config('account');
+        $sender = strtok($this->dispatch->user->name, ' ');
 
-        $this->from(env('MAIL_FROM_ADDRESS'), $account->name)
+        $this->from(env('MAIL_FROM_ADDRESS'), "{$sender} da {$account->name}")
             ->subject("{$this->dispatch->subject}")
             ->replyTo($this->dispatch->user->email)
             ->view('emails.default', [
-                'subject'       => "{$this->dispatch->company->name}: {$this->dispatch->subject}",
+                'subject'       => $this->dispatch->subject,
+                'company'       => $this->dispatch->company,
                 'description'   => $this->dispatch->message,
                 'documents'     => $this->transformCollection($this->dispatch->documents, new DocumentTransformer()),
                 'regards'       => [

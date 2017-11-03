@@ -236,7 +236,7 @@
                                        style="font-size:0px;width:100%;" align="center" border="0">
                                     <tbody>
                                         <tr>
-                                            <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:15px 30px;">
+                                            <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:15px 30px 5px;">
                                                 <!--[if mso | IE]>
                                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                                     <tr>
@@ -256,6 +256,37 @@
                             <!--[if mso | IE]>
                             </td>
                             </tr>
+
+                            @if (! empty($company))
+                            <tr>
+                                <td style="width:600px;">
+                            <![endif]-->
+                            <div style="margin:0px auto;max-width:600px;">
+                                <table role="presentation" cellpadding="0" cellspacing="0"
+                                       style="font-size:0px;width:100%;" align="center" border="0">
+                                    <tbody>
+                                        <tr>
+                                            <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:0 30px; 15px">
+                                                <!--[if mso | IE]>
+                                                <table role="presentation" border="0" cellpadding="0" cellspacing="0">
+                                                    <tr>
+                                                        <td style="vertical-align:undefined;width:600px;">
+                                                <![endif]-->
+                                                <div style="cursor:auto;color:#888;font-family:'Open Sans', Arial;font-size:12px;line-height:22px;text-align:left;">
+                                                    Empresa {{ $company->nickname }}
+                                                </div>
+                                                <!--[if mso | IE]>
+                                                </td></tr></table>
+                                                <![endif]-->
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <!--[if mso | IE]>
+                            </td>
+                            </tr>
+                            @endif
 
                             @if (! empty($description))
                             <tr>
