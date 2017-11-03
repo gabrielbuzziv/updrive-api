@@ -266,7 +266,7 @@
                                        style="font-size:0px;width:100%;" align="center" border="0">
                                     <tbody>
                                         <tr>
-                                            <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:0 30px; 15px">
+                                            <td style="text-align:center;vertical-align:top;direction:ltr;font-size:0px;padding:0 30px 15px;">
                                                 <!--[if mso | IE]>
                                                 <table role="presentation" border="0" cellpadding="0" cellspacing="0">
                                                     <tr>
