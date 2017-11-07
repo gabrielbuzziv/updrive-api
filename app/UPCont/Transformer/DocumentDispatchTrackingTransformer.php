@@ -40,7 +40,7 @@ class DocumentDispatchTrackingTransformer extends TransformerAbstract
         return [
             'id'         => (int) $track->id,
             'status'     => $track->status,
-            'created_at' => $track->created_at->format('d/m/Y \à\s H:i'),
+            'created_at' => $track->created_at->format('d/m/Y H:i'),
         ];
     }
 
