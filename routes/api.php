@@ -131,5 +131,8 @@ Route::group(['middleware' => 'auth:api'], function () {
     /**
      * ReportController routes.
      */
-    Route::get('reports/sent', 'ReportController@sent');
+    Route::get('reports/{id}', 'ReportController@index');
+    Route::get('reports/{report}/show', 'ReportController@show');
+    Route::get('reports/{report}/status', 'ReportController@getStatusReport');
+    Route::post('reports/{id}', 'ReportController@store');
 });
