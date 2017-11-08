@@ -45,7 +45,6 @@ class Document extends Model
         'validity',
         'note',
         'status',
-        'dispatch_id',
     ];
 
     /**
@@ -315,12 +314,12 @@ class Document extends Model
     }
 
     /**
-     * A document has one dispatch.
+     * A document belongs to many dispatches.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function dispatch()
     {
-        return $this->belongsTo(DocumentDispatch::class, 'dispatch_id');
+        return $this->belongsTo(Dispatch::class, 'dispatch_id', 'sender_id');
     }
 }

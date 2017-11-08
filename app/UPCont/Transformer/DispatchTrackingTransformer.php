@@ -2,13 +2,13 @@
 
 namespace App\UPCont\Transformer;
 
-use App\DocumentDispatchTracking;
+use App\DispatchTracking;
 use App\Http\Controllers\DocumentCategoryController;
 use Carbon\Carbon;
 use League\Fractal\TransformerAbstract;
 use App\Document;
 
-class DocumentDispatchTrackingTransformer extends TransformerAbstract
+class DispatchTrackingTransformer extends TransformerAbstract
 {
 
     /**
@@ -26,16 +26,16 @@ class DocumentDispatchTrackingTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'contact', 'dispatch',
+        'recipient', 'dispatch',
     ];
 
     /**
      * Document default transformation.
      *
-     * @param DocumentDispatchTracking $track
+     * @param DispatchTracking $track
      * @return array
      */
-    public function transform(DocumentDispatchTracking $track)
+    public function transform(DispatchTracking $track)
     {
         return [
             'id'         => (int) $track->id,
@@ -47,22 +47,22 @@ class DocumentDispatchTrackingTransformer extends TransformerAbstract
     /**
      * Include contact transformer.
      *
-     * @param DocumentDispatchTracking $track
+     * @param DispatchTracking $track
      * @return \League\Fractal\Resource\Item
      */
-    public function includeContact(DocumentDispatchTracking $track)
+    public function includeRecipient(DispatchTracking $track)
     {
-        return $this->item($track->contact, new ContactTransformer());
+        return $this->item($track->recipient, new ContactTransformer());
     }
 
     /**
      * Include dispatch transformer.
      *
-     * @param DocumentDispatchTracking $track
+     * @param DispatchTracking $track
      * @return \League\Fractal\Resource\Item
      */
-    public function includeDispatch(DocumentDispatchTracking $track)
+    public function includeDispatch(DispatchTracking $track)
     {
-        return $this->item($track->dispatch, new DocumentDispatchTransformer());
+        return $this->item($track->dispatch, new DispatchTransformer());
     }
 }

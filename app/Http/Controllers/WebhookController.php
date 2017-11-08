@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Account;
-use App\DocumentDispatch;
-use App\DocumentDispatchTracking;
+use App\Dispatch;
+use App\DispatchTracking;
 use App\Events\NewMailTracking;
 use App\Notifications\EmailDeliveredNotification;
 use App\Notifications\EmailOpenedNotification;
@@ -14,6 +14,15 @@ use Illuminate\Support\Facades\Log;
 
 class WebhookController extends Controller
 {
+
+    /**
+     * WebhookController constructor.
+     */
+    public function __construct()
+    {
+        Log::useDailyFiles(storage_path('/logs/deliveries.log'));
+    }
+
     /**
      * Tracking Deliveries.
      */
@@ -68,7 +77,7 @@ class WebhookController extends Controller
 //            $this->track('dropped');
 //        }
 
-        Log::useDailyFiles(storage_path().'/logs/tracking-dropped.log');
+        Log::useDailyFiles(storage_path() . '/logs/tracking-dropped.log');
         Log::info(request()->all());
     }
 
@@ -80,8 +89,8 @@ class WebhookController extends Controller
     private function isTrackable()
     {
         return request()->get('account')
-                && request()->get('dispatch')
-                && request()->get('contact') ? true : false;
+        && request()->get('dispatch')
+        && request()->get('recipient') ? true : false;
     }
 
     /**
@@ -101,22 +110,22 @@ class WebhookController extends Controller
      */
     private function track($status = 'sent', $notification = '')
     {
-        $contactId = request()->get('contact');
-        $dispatch = DocumentDispatch::find(request()->get('dispatch'));
+        $recipientId = request()->get('recipient');
+        $dispatch = Dispatch::find(request()->get('dispatch'));
 
-        $dispatch->contacts->each(function ($contact) use ($contactId, $dispatch, $status, $notification) {
-            if ($contact->id == $contactId) {
-                $this->createTracking($dispatch, $contact, $status);
+        $dispatch->recipients->each(function ($recipient) use ($recipientId, $dispatch, $status, $notification) {
+            if ($recipient->id == $recipientId) {
+                $this->createTracking($dispatch, $recipient, $status);
 
                 event(new NewMailTracking());
 
-                if (! empty($notification) && $dispatch->user->notificationsSettings->contains('notification', $notification)) {
+                if ( ! empty($notification) && $dispatch->sender->notificationsSettings->contains('notification', $notification)) {
                     switch ($notification) {
                         case 'email_delivered':
-                            $dispatch->user->notify(new EmailDeliveredNotification($dispatch, $contact));
+                            $dispatch->sender->notify(new EmailDeliveredNotification($dispatch, $recipient));
                             break;
                         case 'email_opened':
-                            $dispatch->user->notify(new EmailOpenedNotification($dispatch, $contact));
+                            $dispatch->sender->notify(new EmailOpenedNotification($dispatch, $recipient));
                             break;
                     }
                 }
@@ -127,16 +136,36 @@ class WebhookController extends Controller
     /**
      * Create the document dispatch tracking register.
      *
-     * @param DocumentDispatch $dispatch
-     * @param User $contact
-     * @param string $status
+     * @param Dispatch $dispatch
+     * @param User $recipient
+     * @param $status
      */
-    private function createTracking(DocumentDispatch $dispatch, User $contact, $status)
+    private function createTracking(Dispatch $dispatch, User $recipient, $status)
     {
-        DocumentDispatchTracking::create([
-            'dispatch_id' => $dispatch->id,
-            'contact_id'  => $contact->id,
-            'status'      => $status,
+        DispatchTracking::create([
+            'dispatch_id'  => $dispatch->id,
+            'recipient_id' => $recipient->id,
+            'status'       => $status,
         ]);
+
+        $dispatch->documents->each(function ($document) use ($recipient, $status) {
+            $document->history()->create(['user_id' => $recipient->id, 'action' => $this->getStatusId($status)]);
+        });
+    }
+
+    /**
+     * Convert the dispatch tracking status to history status id.
+     *
+     * @param $status
+     * @return int
+     */
+    private function getStatusId($status)
+    {
+        switch ($status) {
+            case 'sent':
+                return 2;
+            case 'delivered':
+                return 7;
+        }
     }
 }

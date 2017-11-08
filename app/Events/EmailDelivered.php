@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\DocumentDispatch;
+use App\Dispatch;
 use App\Http\Controllers\Traits\Transformable;
 use App\UPCont\Transformer\ContactTransformer;
 use App\UPCont\Transformer\UserTransformer;
@@ -43,17 +43,17 @@ class EmailDelivered implements ShouldBroadcast
     /**
      * Create a new event instance.
      *
-     * @param DocumentDispatch $dispatch
-     * @param User $contact
+     * @param Dispatch $dispatch
+     * @param User $recipient
      */
-    public function __construct(DocumentDispatch $dispatch, User $contact)
+    public function __construct(Dispatch $dispatch, User $recipient)
     {
         $this->account = config('account')->slug;
         $this->type = 'EmailDelivered';
         $this->data = [
-            'subject' => $dispatch->subject,
-            'user'    => $this->transformItem($dispatch->user, new UserTransformer()),
-            'contact' => $this->transformItem($contact, new ContactTransformer()),
+            'subject'   => $dispatch->subject,
+            'user'      => $this->transformItem($dispatch->sender, new UserTransformer()),
+            'recipient' => $this->transformItem($recipient, new ContactTransformer()),
         ];
     }
 

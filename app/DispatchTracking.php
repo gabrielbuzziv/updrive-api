@@ -4,9 +4,8 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DocumentDispatchTracking extends Model
+class DispatchTracking extends Model
 {
-
     /**
      * Database connection.
      *
@@ -19,23 +18,23 @@ class DocumentDispatchTracking extends Model
      *
      * @var string
      */
-    protected $table = 'documents_dispatch_tracking';
+    protected $table = 'dispatches_tracking';
 
     /**
      * The attributes that can be assigned.
      *
      * @var array
      */
-    protected $fillable = ['dispatch_id', 'contact_id', 'status'];
+    protected $fillable = ['dispatch_id', 'recipient_id', 'status'];
 
     /**
-     * Belongs to a DocumentDispatch.
+     * Belongs to a dispatch.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function dispatch()
     {
-        return $this->belongsTo(DocumentDispatch::class);
+        return $this->belongsTo(Dispatch::class);
     }
 
     /**
@@ -43,8 +42,8 @@ class DocumentDispatchTracking extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function contact()
+    public function recipient()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'recipient_id');
     }
 }

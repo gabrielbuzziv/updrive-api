@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Company;
+use App\Dispatch;
+use App\DispatchTracking;
 use App\Document;
 use App\DocumentDispatch;
 use App\DocumentDispatchTracking;
@@ -13,8 +15,8 @@ use App\Http\Requests\SendDocumentRequest;
 use App\Mail\NewDocuments;
 use App\Notifications\NewDocumentsNotification;
 use App\UPCont\Transformer\CompanyTransformer;
-use App\UPCont\Transformer\DocumentDispatchTrackingTransformer;
-use App\UPCont\Transformer\DocumentDispatchTransformer;
+use App\UPCont\Transformer\DispatchTrackingTransformer;
+use App\UPCont\Transformer\DispatchTransformer;
 use App\UPCont\Transformer\DocumentTransformer;
 use App\UPCont\Transformer\FolderTransformer;
 use App\User;
@@ -48,7 +50,7 @@ class UPDriveController extends ApiController
             ->search(request('filter'), null, true)
             ->leftJoin('company_contact', 'company_contact.company_id', 'companies.id')
             ->where(function ($query) {
-                if (! auth()->user()->can('manage-core'))
+                if ( ! auth()->user()->can('manage-core'))
                     $query->where('company_contact.contact_id', auth()->user()->id);
             })
             ->paginate($limit);
@@ -77,7 +79,7 @@ class UPDriveController extends ApiController
                 if (request('company'))
                     $query->where('documents.company_id', request('company'));
 
-                if (! auth()->user()->can('manage-core')) {
+                if ( ! auth()->user()->can('manage-core')) {
                     $query->where('document_contact.contact_id', auth()->user()->id);
                     $query->where('company_contact.contact_id', auth()->user()->id);
                 }
@@ -113,26 +115,29 @@ class UPDriveController extends ApiController
         $documents = $this->parseDocuments(request('documents'));
         $documentsId = [];
 
-        $dispatch = DocumentDispatch::create([
+        $dispatch = Dispatch::create([
             'company_id' => $company->id,
-            'user_id'    => auth()->user()->id,
+            'sender_id'  => auth()->user()->id,
             'subject'    => $subject,
             'message'    => nl2br($message),
         ]);
 
+        $attachments = [];
+
         foreach ($documents as $document) {
             $document = Document::create([
-                'user_id'     => auth()->user()->id,
-                'name'        => $document['name'],
-                'filename'    => $document['file'],
-                'cycle'       => ! empty($document['cycle']) ? $document['cycle'] : null,
-                'validity'    => ! empty($document['validity']) ? $document['validity'] : null,
-                'status'      => 2,
-                'company_id'  => $company->id,
-                'dispatch_id' => $dispatch->id,
+                'user_id'    => auth()->user()->id,
+                'name'       => $document['name'],
+                'filename'   => $document['file'],
+                'cycle'      => ! empty($document['cycle']) ? $document['cycle'] : null,
+                'validity'   => ! empty($document['validity']) ? $document['validity'] : null,
+                'status'     => 2,
+                'company_id' => $company->id,
             ]);
 
-            $document->history()->create(['user_id' => auth()->user()->id, 'action' => 2]);
+            $dispatch->documents()->attach($document->id);
+            $attachments[] = $document;
+
             $document->sharedWith()->attach(array_map(function ($contact) {
                 return $contact['id'];
             }, $contacts));
@@ -141,24 +146,29 @@ class UPDriveController extends ApiController
         }
 
         foreach ($contacts as $contact) {
-            $dispatch->contacts()->attach($contact->id);
+            $dispatch->recipients()->attach($contact->id);
 
-            if (! $company->contacts->contains($contact->id)) {
+            if ( ! $company->contacts->contains($contact->id)) {
                 $company->contacts()->attach($contact->id);
             }
 
-            if (! $contact->is_contact) {
+            if ( ! $contact->is_contact) {
                 $contact->is_contact = true;
                 $contact->save();
             }
 
+            // Create a history saying that the document was sent to the contact.
+            foreach ($attachments as $attachment) {
+                $attachment->history()->create(['user_id' => $contact->id, 'action' => 2]);
+            }
+
             Mail::to($contact->email)->send(new NewDocuments($dispatch, $contact));
-            DocumentDispatchTracking::create([
-                'dispatch_id' => $dispatch->id,
-                'contact_id'  => $contact->id,
-                'status'      => 'sent',
+
+            DispatchTracking::create([
+                'dispatch_id'  => $dispatch->id,
+                'recipient_id' => $contact->id,
+                'statys'       => 'sent'
             ]);
-            event(new NewMailTracking());
         }
 
         return $this->respond([
@@ -175,7 +185,7 @@ class UPDriveController extends ApiController
      */
     public function dispatchDetails(DocumentDispatch $dispatch)
     {
-        return $this->respond($this->transformItem($dispatch, new DocumentDispatchTransformer()));
+        return $this->respond($this->transformItem($dispatch, new DispatchTransformer()));
     }
 
     /**

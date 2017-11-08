@@ -62,7 +62,7 @@ class DocumentTransformer extends TransformerAbstract
     public function includeDispatch(Document $document)
     {
         if ($document->dispatch) {
-            return $this->item($document->dispatch, new DocumentDispatchTransformer());
+            return $this->item($document->dispatch, new DispatchTransformer());
         }
     }
 

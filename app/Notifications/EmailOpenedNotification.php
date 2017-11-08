@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\DocumentDispatch;
+use App\Dispatch;
 use App\Events\EmailOpened;
 use App\Http\Controllers\Traits\Transformable;
 use App\UPCont\Transformer\ContactTransformer;
@@ -12,12 +12,13 @@ use Illuminate\Notifications\Notification;
 
 class EmailOpenedNotification extends Notification
 {
+
     use Transformable;
 
     /**
      * Dispatch
      *
-     * @var DocumentDispatch
+     * @var Dispatch
      */
     protected $dispatch;
 
@@ -26,20 +27,20 @@ class EmailOpenedNotification extends Notification
      *
      * @var User
      */
-    protected $contact;
+    protected $recipient;
 
     /**
      * Create a new notification instance.
      *
-     * @param DocumentDispatch $dispatch
-     * @param User $contact
+     * @param Dispatch $dispatch
+     * @param User $recipient
      */
-    public function __construct(DocumentDispatch $dispatch, User $contact)
+    public function __construct(Dispatch $dispatch, User $recipient)
     {
         $this->dispatch = $dispatch;
-        $this->contact = $contact;
+        $this->recipient = $recipient;
 
-        event(new EmailOpened($this->dispatch, $this->contact));
+        event(new EmailOpened($this->dispatch, $this->recipient));
     }
 
     /**
@@ -62,9 +63,9 @@ class EmailOpenedNotification extends Notification
     public function toArray($notifiable)
     {
         return [
-            'subject' => $this->dispatch->subject,
-            'user'    => $this->transformItem($this->dispatch->user, new UserTransformer()),
-            'contact' => $this->transformItem($this->contact, new ContactTransformer())
+            'subject'   => $this->dispatch->subject,
+            'user'      => $this->transformItem($this->dispatch->sender, new UserTransformer()),
+            'recipient' => $this->transformItem($this->recipient, new ContactTransformer())
         ];
     }
 }
