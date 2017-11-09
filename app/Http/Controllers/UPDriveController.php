@@ -69,19 +69,17 @@ class UPDriveController extends ApiController
     {
         $query = request('query');
         $limit = request('limit') ?: 25;
-        $include = ['company', 'user', 'sharedWith', 'history.user', 'dispatch.tracking.contact'];
-        $documents = Document::select(DB::raw('DISTINCT documents.*'))
+        $include = ['company', 'user', 'sharedWith', 'history.user', 'dispatch.tracking.recipient'];
+        $documents = (new Document)
             ->with($include)
-            ->leftJoin('company_contact', 'company_contact.company_id', 'documents.company_id')
-            ->leftJoin('document_contact', 'document_contact.document_id', 'documents.id')
             ->search($query)
             ->where(function ($query) {
                 if (request('company'))
-                    $query->where('documents.company_id', request('company'));
+                    $query->where('company_id', request('company'));
 
                 if ( ! auth()->user()->can('manage-core')) {
-                    $query->where('document_contact.contact_id', auth()->user()->id);
-                    $query->where('company_contact.contact_id', auth()->user()->id);
+                    $user = auth()->user();
+                    $query->whereRaw("{$user->id} in (SELECT GROUP_CONCAT(document_contact.contact_id) FROM document_contact WHERE document_contact.document_id = documents.id)");
                 }
 
                 if (request('status'))
