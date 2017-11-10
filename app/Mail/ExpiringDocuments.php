@@ -14,6 +14,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 
 class ExpiringDocuments extends Mailable
 {
+
     use Queueable, SerializesModels, Transformable;
 
     /**
@@ -80,9 +81,9 @@ class ExpiringDocuments extends Mailable
         $this->withSwiftMessage(function ($message) {
             $message->getHeaders()
                 ->addTextHeader('X-Mailgun-Variables', json_encode([
-                    'account'   => config('account')->id,
-                    'dispatch'  => $this->dispatch->id,
-                    'recipient' => $this->recipient->id
+                    'account'  => config('account')->id,
+                    'dispatch' => $this->dispatch->id,
+                    'contact'  => $this->recipient->id
                 ]));
         });
     }

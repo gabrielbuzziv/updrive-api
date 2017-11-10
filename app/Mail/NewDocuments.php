@@ -82,9 +82,9 @@ class NewDocuments extends Mailable
         $this->withSwiftMessage(function ($message) {
             $message->getHeaders()
                 ->addTextHeader('X-Mailgun-Variables', json_encode([
-                    'account'   => config('account')->id,
-                    'dispatch'  => $this->dispatch->id,
-                    'recipient' => $this->recipient->id
+                    'account'  => config('account')->id,
+                    'dispatch' => $this->dispatch->id,
+                    'contact'  => $this->recipient->id
                 ]));
         });
     }

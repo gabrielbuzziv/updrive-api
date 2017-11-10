@@ -37,22 +37,11 @@ class WebhookController extends Controller
     /**
      * Tracking Opened.
      */
-    public function trackingOpened()
+    public function trackingRead()
     {
         if ($this->isTrackable()) {
             $this->setupDatabase();
-            $this->track('opened', 'email_opened');
-        }
-    }
-
-    /**
-     * Tracking Opens.
-     */
-    public function trackingSpams()
-    {
-        if ($this->isTrackable()) {
-            $this->setupDatabase();
-            $this->track('spam');
+            $this->track('read', 'email_opened');
         }
     }
 
@@ -84,15 +73,13 @@ class WebhookController extends Controller
     /**
      * Check if is a trackable data.
      *
-     * @ Entregue
-return bool Entregue
-
+     * @return bool
      */
     private function isTrackable()
     {
         return request()->get('account')
         && request()->get('dispatch')
-        && request()->get('recipient') ? true : false;
+        && request()->get('contact') ? true : false;
     }
 
     /**
@@ -112,11 +99,18 @@ return bool Entregue
      */
     private function track($status = 'sent', $notification = '')
     {
-        $recipientId = request()->get('recipient');
+        $recipientId = request()->get('contact');
         $dispatch = Dispatch::find(request()->get('dispatch'));
 
         $dispatch->recipients->each(function ($recipient) use ($recipientId, $dispatch, $status, $notification) {
             if ($recipient->id == $recipientId) {
+
+                Log::info([
+                    'dispatch' => $dispatch->id,
+                    'recipient' => $recipient->id,
+                    'status' => $status
+                ]);
+
                 $this->createTracking($dispatch, $recipient, $status);
 
                 event(new NewMailTracking());
@@ -144,6 +138,8 @@ return bool Entregue
      */
     private function createTracking(Dispatch $dispatch, User $recipient, $status)
     {
+        Log::info(["Create tracking for {$status}"]);
+
         DispatchTracking::create([
             'dispatch_id'  => $dispatch->id,
             'recipient_id' => $recipient->id,
@@ -168,6 +164,8 @@ return bool Entregue
                 return 2;
             case 'delivered':
                 return 7;
+            case 'read':
+                return 8;
         }
     }
 }
