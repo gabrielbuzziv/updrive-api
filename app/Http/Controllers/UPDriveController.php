@@ -83,7 +83,7 @@ class UPDriveController extends ApiController
                 }
 
                 if (request('status'))
-                    $query->where('documents.status', request('status'));
+                    $query->whereIn('documents.status', $this->getStatusIds());
 
                 $query->where('documents.status', '>', 1);
             })
@@ -165,7 +165,7 @@ class UPDriveController extends ApiController
             DispatchTracking::create([
                 'dispatch_id'  => $dispatch->id,
                 'recipient_id' => $contact->id,
-                'statys'       => 'sent'
+                'status'       => 'sent'
             ]);
         }
 
@@ -278,5 +278,24 @@ class UPDriveController extends ApiController
         }
 
         return false;
+    }
+
+    /**
+     * Get document status ID
+     *
+     * @return array
+     */
+    private function getStatusIds()
+    {
+        $status = request('status');
+
+        switch ($status) {
+            case 'pending':
+                return [2];
+            case 'opened':
+                return [3, 4];
+            case 'expired':
+                return [5];
+        }
     }
 }

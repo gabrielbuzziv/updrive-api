@@ -21,6 +21,8 @@ class InsertDocumentHistoryBasedInDispatches extends Migration
             $documents = DB::table('dispatch_document')->where('dispatch_id', $dispatch->id)->get();
 
             $documents->each(function ($document) use ($trackings) {
+                DB::table('documents_history')->where('action', 2)->delete();
+
                 $trackings->each(function ($tracking) use ($document) {
                     DB::table('documents_history')->insert([
                         'user_id'     => $tracking->recipient_id,
@@ -52,6 +54,7 @@ class InsertDocumentHistoryBasedInDispatches extends Migration
                         ->where('document_id', $document->document_id)
                         ->where('action', $this->getStatusId($tracking->status))
                         ->where('created_at', $tracking->created_at)
+                        ->where('action', '<>', 2)
                         ->delete();
                 });
             });

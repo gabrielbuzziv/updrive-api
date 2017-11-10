@@ -121,7 +121,7 @@ return bool Entregue
 
                 event(new NewMailTracking());
 
-                if ( ! empty($notification) && $dispatch->sender->notificationsSettings->contains('notification', $notification)) {
+                if ( ! empty($notification) && $dispatch->sender && $dispatch->sender->notificationsSettings->contains('notification', $notification)) {
                     switch ($notification) {
                         case 'email_delivered':
                             $dispatch->sender->notify(new EmailDeliveredNotification($dispatch, $recipient));

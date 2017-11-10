@@ -16,7 +16,7 @@ class CreateDispatchesTable extends Migration
         Schema::create('dispatches', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('company_id')->unsigned();
-            $table->integer('sender_id')->unsigned();
+            $table->integer('sender_id')->unsigned()->nullable();
             $table->string('subject');
             $table->longText('message');
             $table->timestamps();
