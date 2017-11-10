@@ -87,30 +87,4 @@ class ExpiringDocuments extends Mailable
                 ]));
         });
     }
-
-    /**
-     * Generate data base in the days left to expire document.
-     *
-     * @return object
-     */
-    private function getData()
-    {
-        switch ($this->days) {
-            case 0:
-                return (object) [
-                    'subject'     => 'Você tem documentos que vencem hoje.',
-                    'description' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para hoje.'
-                ];
-            case 1:
-                return (object) [
-                    'subject'     => 'Você tem documentos que vencem amanhã.',
-                    'description' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para amanhã.'
-                ];
-            case 2:
-                return (object) [
-                    'subject'     => 'Você tem documentos que vencem em 2 dias.',
-                    'description' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento em 2 dias.'
-                ];
-        }
-    }
 }

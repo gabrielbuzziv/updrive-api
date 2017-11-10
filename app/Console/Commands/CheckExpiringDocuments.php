@@ -103,22 +103,16 @@ class CheckExpiringDocuments extends Command
 
                 foreach ($contact->documents as $document) {
                     $dispatch->documents()->attach($document->id);
-                    $document->history()->create(['user_id' => $contact->contact->id, 'action' => 6]);
+                    $document->history()->create([
+                        'user_id' => $contact->contact->id,
+                        'action' => 6,
+                        'description' => $this->getInfo($days)->info
+                    ]);
                 }
 
                 Mail::to($contact->contact->email)->send(new ExpiringDocuments($dispatch, $contact->contact));
             }
         }
-
-//
-//        foreach ($this->notifications as $notification) {
-//            $notification = (object) $notification;
-//            $notification->contact->notify(new ExpiringDocumentsNotification($notification, $days));
-//
-//            foreach ($notification->documents as $document) {
-//                $document->history()->create(['user_id' => $notification->contact->id, 'action' => 6]);
-//            }
-//        }
     }
 
     /**
@@ -135,23 +129,32 @@ class CheckExpiringDocuments extends Command
             ->get();
     }
 
+    /**
+     * Get info based in days left to expire.
+     *
+     * @param $days
+     * @return object
+     */
     private function getInfo($days)
     {
-        switch ($days) {
+        switch ($this->days) {
             case 0:
                 return (object) [
-                    'subject' => 'Você tem documentos que vencem hoje.',
-                    'message' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para hoje.'
+                    'subject'     => 'Você tem documentos que vencem hoje.',
+                    'description' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para hoje.',
+                    'info'        => 'Notificação sobre prazo do vencimento do documento expirando hoje.'
                 ];
             case 1:
                 return (object) [
-                    'subject' => 'Você tem documentos que vencem amanhã.',
-                    'message' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para amanhã.'
+                    'subject'     => 'Você tem documentos que vencem amanhã.',
+                    'description' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para amanhã.',
+                    'info'        => 'Notificação sobre prazo do vencimento do documento expirando em 1 dia.'
                 ];
             case 2:
                 return (object) [
-                    'subject' => 'Você tem documentos que vencem em 2 dias.',
-                    'message' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento em 2 dias.'
+                    'subject'     => 'Você tem documentos que vencem em 2 dias.',
+                    'description' => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento em 2 dias.',
+                    'info'        => 'Notificação sobre prazo do vencimento do documento expirando em 2 dias.'
                 ];
         }
     }

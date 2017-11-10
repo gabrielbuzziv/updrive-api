@@ -28,7 +28,7 @@ class DocumentHistory extends Model
      * @var array
      */
     protected $fillable = [
-        'user_id', 'document_id', 'action'
+        'user_id', 'document_id', 'action', 'description'
     ];
 
     /**

@@ -37,6 +37,7 @@ class DocumentHistoryTransformer extends TransformerAbstract
         return [
             'id' => (int) $history->id,
             'action' => $history->action,
+            'description' => $history->description,
             'created_at' => $history->created_at->format('d/m/Y \à\s H:i')
         ];
     }
