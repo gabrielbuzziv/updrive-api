@@ -52,7 +52,8 @@ class WebhookController extends Controller
     {
         if ($this->isTrackable()) {
             $this->setupDatabase();
-            $this->track('bounce');
+            $recipient = request('recipient');
+            $this->track('failed', null, "A mensagem não foi entregue pois o e-mail {$recipient} não foi encontrado.");
         }
     }
 
@@ -61,13 +62,15 @@ class WebhookController extends Controller
      */
     public function trackingDropped()
     {
-//        if ($this->isTrackable()) {
-//            $this->setupDatabase();
-//            $this->track('dropped');
-//        }
+        if ($this->isTrackable()) {
+            $this->setupDatabase();
 
-        Log::useDailyFiles(storage_path() . '/logs/tracking-dropped.log');
-        Log::info(request()->all());
+            $description = request('reason') == 'hardfail'
+                ? 'O envio para este destinatário já sofreu falha anteriormente, verifique se o endereço de e-mail está correto.'
+                : 'Tentamos enviar o e-mail durante 8 horas, mas não foi possível fazer comunicação com o servidor do destinatário.';
+
+            $this->track('failed', null, $description);
+        }
     }
 
     /**
@@ -97,21 +100,21 @@ class WebhookController extends Controller
      * @param string $status
      * @param string $notification
      */
-    private function track($status = 'sent', $notification = '')
+    private function track($status = 'sent', $notification = null, $description = null)
     {
         $recipientId = request()->get('contact');
         $dispatch = Dispatch::find(request()->get('dispatch'));
 
-        $dispatch->recipients->each(function ($recipient) use ($recipientId, $dispatch, $status, $notification) {
+        $dispatch->recipients->each(function ($recipient) use ($recipientId, $dispatch, $status, $notification, $description) {
             if ($recipient->id == $recipientId) {
 
                 Log::info([
-                    'dispatch' => $dispatch->id,
+                    'dispatch'  => $dispatch->id,
                     'recipient' => $recipient->id,
-                    'status' => $status
+                    'status'    => $status
                 ]);
 
-                $this->createTracking($dispatch, $recipient, $status);
+                $this->createTracking($dispatch, $recipient, $status, $description);
 
                 event(new NewMailTracking());
 
@@ -136,18 +139,20 @@ class WebhookController extends Controller
      * @param User $recipient
      * @param $status
      */
-    private function createTracking(Dispatch $dispatch, User $recipient, $status)
+    private function createTracking(Dispatch $dispatch, User $recipient, $status, $description = null)
     {
-        Log::info(["Create tracking for {$status}"]);
-
         DispatchTracking::create([
             'dispatch_id'  => $dispatch->id,
             'recipient_id' => $recipient->id,
             'status'       => $status,
         ]);
 
-        $dispatch->documents->each(function ($document) use ($recipient, $status) {
-            $document->history()->create(['user_id' => $recipient->id, 'action' => $this->getStatusId($status)]);
+        $dispatch->documents->each(function ($document) use ($recipient, $status, $description) {
+            $document->history()->create([
+                'user_id'     => $recipient->id,
+                'action'      => $this->getStatusId($status),
+                'description' => $description,
+            ]);
         });
     }
 
