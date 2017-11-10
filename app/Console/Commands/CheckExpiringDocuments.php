@@ -137,7 +137,7 @@ class CheckExpiringDocuments extends Command
      */
     private function getInfo($days)
     {
-        switch ($this->days) {
+        switch ($days) {
             case 0:
                 return (object) [
                     'subject'     => 'Você tem documentos que vencem hoje.',
