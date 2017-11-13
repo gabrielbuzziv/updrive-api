@@ -83,8 +83,8 @@ class ReportController extends ApiController
         });
 
         if (isset($filters['between'])) {
-            $filters['between'][0] = Carbon::createFromFormat('Y-m-d\TH:i:s.000Z', $filters['between'][0]);
-            $filters['between'][1] = Carbon::createFromFormat('Y-m-d\TH:i:s.000Z', $filters['between'][1]);
+            $filters['between'][0] = Carbon::createFromFormat('Y-m-d\TH:i:s.000Z', $filters['between'][0])->hour(0)->minute(0)->second(0);
+            $filters['between'][1] = Carbon::createFromFormat('Y-m-d\TH:i:s.000Z', $filters['between'][1])->hour(23)->minute(59)->second(59);
         }
 
         $include = ['company', 'user', 'sharedWith'];
@@ -104,9 +104,8 @@ class ReportController extends ApiController
                 if (isset($filters->sender))
                     $query->where('user_id', $filters->sender['id']);
 
-                if (isset($filters->between)) {
+                if (isset($filters->between))
                     $query->whereBetween('created_at', [$filters->between[0], $filters->between[1]]);
-                }
             })
             ->orderBy(DB::raw('CASE WHEN status = 2 THEN 1 ELSE 2 END'))
             ->orderBy('created_at', 'desc')
