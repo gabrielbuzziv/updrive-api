@@ -150,6 +150,8 @@
                                     E-mail Entregue
                                 @elseif ($history->action == 8)
                                     E-mail Lido
+                                @elseif ($history->action == 9)
+                                    Falha no envio
                                 @endif
                             </td>
                             <td width="33.33%">
