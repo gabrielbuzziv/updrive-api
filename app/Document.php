@@ -45,6 +45,8 @@ class Document extends Model
         'validity',
         'note',
         'status',
+        'resent_at',
+        'resents',
     ];
 
     /**
@@ -61,7 +63,7 @@ class Document extends Model
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'resent_at'];
 
     /**
      * Scope pending documents.
@@ -192,6 +194,12 @@ class Document extends Model
                 return [
                     'id'    => $value,
                     'name'  => 'Vencido',
+                    'label' => 'label-danger',
+                ];
+            case 6:
+                return [
+                    'id'    => $value,
+                    'name'  => 'Pausado',
                     'label' => 'label-danger',
                 ];
         }

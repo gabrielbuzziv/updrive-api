@@ -131,6 +131,7 @@ class UPDriveController extends ApiController
                 'validity'   => ! empty($document['validity']) ? $document['validity'] : null,
                 'status'     => 2,
                 'company_id' => $company->id,
+                'resent_at' => Carbon::now()
             ]);
 
             $dispatch->documents()->attach($document->id);
@@ -296,6 +297,8 @@ class UPDriveController extends ApiController
                 return [3, 4];
             case 'expired':
                 return [5];
+            case 'paused':
+                return [6];
         }
     }
 }
