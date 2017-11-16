@@ -326,8 +326,8 @@ class Document extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function dispatch()
+    public function dispatches()
     {
-        return $this->belongsTo(Dispatch::class, 'dispatch_id', 'sender_id');
+        return $this->belongsToMany(Dispatch::class, 'dispatch_document');
     }
 }

@@ -68,6 +68,10 @@ class UPDriveController extends ApiController
      */
     public function documents()
     {
+        $document = Document::find(2846);
+        return [$document->dispatches()->first()->tracking()->where('status', 'delivered')->count()];
+
+
         $query = request('query');
         $limit = request('limit') ?: 25;
         $include = ['company', 'user', 'sharedWith', 'history.user', 'dispatch.tracking.recipient'];

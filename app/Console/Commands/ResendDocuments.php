@@ -59,7 +59,6 @@ class ResendDocuments extends Command
                 ->whereNull('validity')
                 ->where('status', 2)
                 ->whereDate('resent_at', '<=', Carbon::today()->subDays(7))
-                ->whereDate('created_at', '>=', Carbon::yesterday())
                 ->get();
 
             $documents->each(function ($document) {

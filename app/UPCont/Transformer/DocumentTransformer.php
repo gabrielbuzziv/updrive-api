@@ -25,7 +25,7 @@ class DocumentTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'history', 'user', 'company', 'sharedWith', 'dispatch'
+        'history', 'user', 'company', 'sharedWith', 'dispatches'
     ];
 
     /**
@@ -59,10 +59,10 @@ class DocumentTransformer extends TransformerAbstract
      * @param Document $document
      * @return \League\Fractal\Resource\Item
      */
-    public function includeDispatch(Document $document)
+    public function includeDispatches(Document $document)
     {
-        if ($document->dispatch) {
-            return $this->item($document->dispatch, new DispatchTransformer());
+        if ($document->dispatches) {
+            return $this->collection($document->dispatch, new DispatchTransformer());
         }
     }
 
