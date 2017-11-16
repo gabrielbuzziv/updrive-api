@@ -58,18 +58,19 @@ class ResendDocuments extends Mailable
     public function build()
     {
         $account = config('account');
+        $sender = $this->dispatch->user ?: $account;
 
         $this->from(env('MAIL_FROM_ADDRESS'), $account->name)
             ->subject("{$this->dispatch->subject}")
-            ->replyTo($account->email)
+            ->replyTo($sender->email)
             ->view('emails.default', [
                 'subject'       => $this->dispatch->subject,
                 'company'       => $this->dispatch->company,
                 'description'   => $this->dispatch->message,
                 'documents'     => $this->transformCollection($this->dispatch->documents, new DocumentTransformer()),
                 'regards'       => [
-                    'name'  => $account->name,
-                    'email' => $account->email,
+                    'name'  => $sender->name,
+                    'email' => $sender->email,
                 ],
                 'token'         => $this->token,
                 'authorize_url' => action('AuthController@refreshToken', $account->slug),

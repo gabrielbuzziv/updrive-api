@@ -13,6 +13,7 @@ use App\Http\Controllers\Traits\Filterable;
 use App\Http\Controllers\Traits\Transformable;
 use App\Http\Requests\SendDocumentRequest;
 use App\Mail\NewDocuments;
+use App\Mail\ResendDocuments;
 use App\Notifications\NewDocumentsNotification;
 use App\UPCont\Transformer\CompanyTransformer;
 use App\UPCont\Transformer\DispatchTrackingTransformer;
@@ -174,6 +175,36 @@ class UPDriveController extends ApiController
             'company'  => $company->id,
             'dispatch' => $dispatch,
         ]);
+    }
+
+    /**
+     * Resend document.
+     *
+     * @param Document $document
+     */
+    public function resend(Document $document)
+    {
+        $user = auth()->user();
+        $dispatch = Dispatch::create([
+            'company_id' => $document->company->id,
+            'sender_id'  => $user->id,
+            'subject'    => "Documento {$document->name}",
+            'message'    => "",
+        ]);
+
+        $dispatch->documents()->attach($document->id);
+        $dispatch->recipients()->attach($document->sharedWith->pluck('id')->all());
+
+        $recipients = request('recipientes') ?: $document->sharedWith;
+        foreach ($recipients as $recipient) {
+            $document->history()->create(['user_id' => $recipient->id, 'action' => 6, 'description' => "Reenvio manual por {$user->name}"]);
+            $dispatch->tracking()->create(['recipient_id' => $recipient->id, 'status' => 'sent']);
+            Mail::to($recipient->email)->send(new ResendDocuments($dispatch, $recipient));
+        }
+
+        $document->sharedWith->each(function ($contact) use ($dispatch, $document, $user) {
+
+        });
     }
 
     /*
