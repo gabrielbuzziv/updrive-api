@@ -71,8 +71,13 @@ class ResendDocuments extends Command
                         $this->notifications[$document->company->id][$contact->id]['documents'][] = $document;
                     });
                 } else {
-                    $document->status = 6;
+                    $document->status = 5;
                     $document->save();
+
+                    $document->history()->create([
+                        'action'      => 10,
+                        'description' => 'Pausado após 3 tentativas de envio.'
+                    ]);
                 }
             });
 

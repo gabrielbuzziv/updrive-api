@@ -96,7 +96,7 @@ class ReportController extends ApiController
                     $query->where('name', 'like', "%{$filters->document}%");
 
                 if (isset($filters->status))
-                    $query->whereIn('status', $filters->status);
+                    $query->where('status', $filters->status);
 
                 if (isset($filters->company))
                     $query->where('company_id', $filters->company['id']);

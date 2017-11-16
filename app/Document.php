@@ -184,23 +184,22 @@ class Document extends Model
                     'label' => 'label-warning',
                 ];
             case 3:
-            case 4:
                 return [
                     'id'    => $value,
                     'name'  => 'Aberto',
                     'label' => 'label-success',
                 ];
-            case 5:
+            case 4:
                 return [
                     'id'    => $value,
                     'name'  => 'Vencido',
                     'label' => 'label-danger',
                 ];
-            case 6:
+            case 5:
                 return [
                     'id'    => $value,
                     'name'  => 'Pausado',
-                    'label' => 'label-danger',
+                    'label' => '',
                 ];
         }
     }
