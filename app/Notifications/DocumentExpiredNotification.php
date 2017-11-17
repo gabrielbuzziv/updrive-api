@@ -40,8 +40,6 @@ class DocumentExpiredNotification extends Notification
         $this->documents = $data->documents;
         $this->user = $data->user;
         $this->token = JWTAuth::fromUser($data->user);
-
-        event(new DocumentExpired($this->documents, $this->user));
     }
 
     /**

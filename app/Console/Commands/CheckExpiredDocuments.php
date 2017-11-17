@@ -80,23 +80,23 @@ class CheckExpiredDocuments extends Command
 
                 $document->history()->create(['user_id' => null, 'action' => 5]);
 
-//                if ($document->type['ext'] == 'pdf') {
-//                    $local = Storage::disk('local');
-//                    $s3    = Storage::disk('s3');
-//
-//                    $path = sprintf('%s/documents/%s', $account->slug, $document->filename);
-//                    $file = $s3->get($path);
-//
-//                    $tmp = "tmp/{$document->filename}";
-//                    $storage = storage_path("app/{$tmp}");
-//
-//                    $local->put("{$tmp}", $file);
-//                    $pdf = new Pdf($storage);
-//                    $pdf->stamp(url('watermark.pdf'))->saveAs($storage);
-//                    $watermarked = $local->get($tmp);
-//                    $s3->put($path, $watermarked);
-//                    $local->delete($tmp);
-//                }
+                if ($document->type['ext'] == 'pdf') {
+                    $local = Storage::disk('local');
+                    $s3    = Storage::disk('s3');
+
+                    $path = sprintf('%s/documents/%s', $account->slug, $document->filename);
+                    $file = $s3->get($path);
+
+                    $tmp = "tmp/{$document->filename}";
+                    $storage = storage_path("app/{$tmp}");
+
+                    $local->put("{$tmp}", $file);
+                    $pdf = new Pdf($storage);
+                    $pdf->stamp(url('watermark.pdf'))->saveAs($storage);
+                    $watermarked = $local->get($tmp);
+                    $s3->put($path, $watermarked);
+                    $local->delete($tmp);
+                }
 
                 $this->info("O documento \"{$document->name}\" venceu.");
             });

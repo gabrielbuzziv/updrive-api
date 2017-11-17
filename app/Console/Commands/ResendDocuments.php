@@ -110,6 +110,7 @@ class ResendDocuments extends Command
             }
 
             $this->info($documents->count());
+            $this->notifications = [];
         });
     }
 }
