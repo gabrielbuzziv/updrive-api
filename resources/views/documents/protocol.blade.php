@@ -130,28 +130,36 @@
                     </tr>
 
                     <tr class="thead">
-                        <th align="center" width="33.33%">Pessoa</th>
-                        <th align="center" width="33.33%">Ação</th>
-                        <th align="center" width="33.33%">Data</th>
+                        <th width="33.33%">Ação</th>
+                        <th width="33.33%">Pessoa</th>
+                        <th align="right" width="33.33%">Data</th>
                     </tr>
 
                     @foreach ($document->history()->orderBy('created_at', 'asc')->get() as $history)
                         <tr class="tbody">
-                            <td align="center" width="33.33%">
-                                {{ $history->user ? $history->user->name : 'Sistema' }}
-                            </td>
-                            <td align="center" width="33.33%">
+                            <td width="33.33%">
                                 @if ($history->action == 2)
-                                    Enviou documento
-                                @elseif ($history->action == 3)
-                                    Baixou documento
-                                @elseif ($history->action == 4)
-                                    Visualizou documento
+                                    Enviado
+                                @elseif ($history->action == 3 || $history->action == 4)
+                                    Aberto
                                 @elseif ($history->action == 5)
-                                    Venceu documento
+                                    Vencido
+                                @elseif ($history->action == 6)
+                                    Reenviado
+                                @elseif ($history->action == 7)
+                                    E-mail Entregue
+                                @elseif ($history->action == 8)
+                                    E-mail Lido
+                                @elseif ($history->action == 9)
+                                    Falha no envio
                                 @endif
                             </td>
-                            <td align="center" width="33.33%">{{ $history->created_at->format('d/m/Y \à\s H:i') }}</td>
+                            <td width="33.33%">
+                                {{ $history->user ? $history->user->name : 'Sistema' }}
+                            </td>
+                            <td align="right" width="33.33%">
+                                {{ $history->created_at->format('d M Y - H:i') }}
+                            </td>
                         </tr>
                     @endforeach
                 </table>

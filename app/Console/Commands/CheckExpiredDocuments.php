@@ -56,11 +56,11 @@ class CheckExpiredDocuments extends Command
             DB::disconnect('account');
             $this->notifications = [];
             setActiveAccount($account);
-            $this->info("Expired Documents check in account '{$account->name}' has started.");
+            $this->info($account->name);
 
             $documents = Document::whereNotNull('validity')
                 ->where('validity', '<', Carbon::today())
-                ->where('status', '<>', 4)
+                ->where('status', 2)
                 ->get();
 
             $this->info("Foram encontrado {$documents->count()} documentos vencido.");

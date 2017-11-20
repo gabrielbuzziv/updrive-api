@@ -12,7 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
-class NewDocuments extends Mailable
+class ExpiringDocuments extends Mailable
 {
 
     use Queueable, SerializesModels, Transformable;
@@ -39,7 +39,7 @@ class NewDocuments extends Mailable
     protected $token;
 
     /**
-     * Create a new message instance.
+     * ExpiringDocuments constructor.
      *
      * @param Dispatch $dispatch
      * @param User $recipient
@@ -59,19 +59,18 @@ class NewDocuments extends Mailable
     public function build()
     {
         $account = config('account');
-        $sender = strtok($this->dispatch->sender->name, ' ');
 
-        $this->from(env('MAIL_FROM_ADDRESS'), "{$sender} da {$account->name}")
+        $this->from(env('MAIL_FROM_ADDRESS'), $account->name)
             ->subject("{$this->dispatch->subject}")
-            ->replyTo($this->dispatch->sender->email)
+            ->replyTo($account->email)
             ->view('emails.default', [
                 'subject'       => $this->dispatch->subject,
                 'company'       => $this->dispatch->company,
                 'description'   => $this->dispatch->message,
                 'documents'     => $this->transformCollection($this->dispatch->documents, new DocumentTransformer()),
                 'regards'       => [
-                    'name'  => $this->dispatch->sender->name,
-                    'email' => $this->dispatch->sender->email,
+                    'name'  => $account->name,
+                    'email' => $account->email,
                 ],
                 'token'         => $this->token,
                 'authorize_url' => action('AuthController@refreshToken', $account->slug),

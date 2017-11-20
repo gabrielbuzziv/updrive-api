@@ -2,11 +2,11 @@
 
 namespace App\UPCont\Transformer;
 
-use App\DocumentDispatch;
+use App\Dispatch;
 use App\Http\Controllers\DocumentCategoryController;
 use League\Fractal\TransformerAbstract;
 
-class DocumentDispatchTransformer extends TransformerAbstract
+class DispatchTransformer extends TransformerAbstract
 {
 
     /**
@@ -24,21 +24,21 @@ class DocumentDispatchTransformer extends TransformerAbstract
      * @var array
      */
     protected $availableIncludes = [
-        'user', 'company', 'contacts', 'documents', 'tracking'
+        'sender', 'company', 'recipients', 'documents', 'tracking'
     ];
 
     /**
      * Document default transformation.
      *
-     * @param DocumentDispatch $dispatch
+     * @param Dispatch $dispatch
      * @return array
      */
-    public function transform(DocumentDispatch $dispatch)
+    public function transform(Dispatch $dispatch)
     {
         return [
-            'id'      => (int) $dispatch->id,
-            'subject' => $dispatch->subject,
-            'message' => $dispatch->message,
+            'id'         => (int) $dispatch->id,
+            'subject'    => $dispatch->subject,
+            'message'    => $dispatch->message,
             'created_at' => $dispatch->created_at->format('d/m/Y \à\s H:i')
         ];
     }
@@ -46,32 +46,32 @@ class DocumentDispatchTransformer extends TransformerAbstract
     /**
      * Include tracking transformer.
      *
-     * @param DocumentDispatch $dispatch
+     * @param Dispatch $dispatch
      * @return \League\Fractal\Resource\Item
      */
-    public function includeTracking(DocumentDispatch $dispatch)
+    public function includeTracking(Dispatch $dispatch)
     {
-        return $this->collection($dispatch->tracking, new DocumentDispatchTrackingTransformer());
+        return $this->collection($dispatch->tracking, new DispatchTrackingTransformer());
     }
 
     /**
      * Include user transformer.
      *
-     * @param DocumentDispatch $dispatch
+     * @param Dispatch $dispatch
      * @return \League\Fractal\Resource\Item
      */
-    public function includeUser(DocumentDispatch $dispatch)
+    public function includeSender(Dispatch $dispatch)
     {
-        return $this->item($dispatch->user, new UserTransformer());
+        return $this->item($dispatch->sender, new UserTransformer());
     }
 
     /**
      * Include company transformer.
      *
-     * @param DocumentDispatch $dispatch
+     * @param Dispatch $dispatch
      * @return \League\Fractal\Resource\Item
      */
-    public function includeCompany(DocumentDispatch $dispatch)
+    public function includeCompany(Dispatch $dispatch)
     {
         return $this->item($dispatch->company, new CompanyTransformer());
     }
@@ -79,21 +79,21 @@ class DocumentDispatchTransformer extends TransformerAbstract
     /**
      * Include contact transformer.
      *
-     * @param DocumentDispatch $dispatch
+     * @param Dispatch $dispatch
      * @return \League\Fractal\Resource\Item
      */
-    public function includeContacts(DocumentDispatch $dispatch)
+    public function includeRecipients(Dispatch $dispatch)
     {
-        return $this->collection($dispatch->contacts, new ContactTransformer());
+        return $this->collection($dispatch->recipients, new ContactTransformer());
     }
 
     /**
      * Include document transformer.
      *
-     * @param DocumentDispatch $dispatch
+     * @param Dispatch $dispatch
      * @return \League\Fractal\Resource\Item
      */
-    public function includeDocuments(DocumentDispatch $dispatch)
+    public function includeDocuments(Dispatch $dispatch)
     {
         return $this->collection($dispatch->documents, new DocumentTransformer());
     }

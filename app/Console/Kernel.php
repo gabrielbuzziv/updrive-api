@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use Aws\Command;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -23,6 +24,11 @@ class Kernel extends ConsoleKernel
          * Documents that already expire.
          */
         Commands\CheckExpiredDocuments::class,
+
+        /**
+         * Resend documents pending documents without validity.
+         */
+        Commands\ResendDocuments::class
     ];
 
     /**
@@ -35,6 +41,7 @@ class Kernel extends ConsoleKernel
     {
         $schedule->command('updrive:expiring-documents')->dailyAt('00:00');
         $schedule->command('updrive:expired-documents')->dailyAt('00:00');
+        $schedule->command('updrive:resend-documents')->dailyAt('00:00');
     }
 
     /**

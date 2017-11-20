@@ -273,7 +273,7 @@
                                                         <td style="vertical-align:undefined;width:600px;">
                                                 <![endif]-->
                                                 <div style="cursor:auto;color:#888;font-family:'Open Sans', Arial;font-size:12px;line-height:22px;text-align:left;">
-                                                    Empresa {{ $company->nickname }}
+                                                    Empresa {{ $company->name }}
                                                 </div>
                                                 <!--[if mso | IE]>
                                                 </td></tr></table>

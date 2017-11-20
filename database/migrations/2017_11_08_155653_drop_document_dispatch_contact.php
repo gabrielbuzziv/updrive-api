@@ -1,0 +1,44 @@
+<?php
+
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Support\Facades\DB;
+
+class DropDocumentDispatchContact extends Migration
+{
+
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::dropIfExists('document_dispatch_contact');
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::create('document_dispatch_contact', function (Blueprint $table) {
+            $table->integer('dispatch_id')->unsigned();
+            $table->integer('contact_id')->unsigned();
+
+            $table->foreign('dispatch_id')->references('id')->on('documents_dispatch')->onDelete('cascade');
+            $table->foreign('contact_id')->references('id')->on('users')->onDelete('cascade');
+        });
+
+        $recipients = DB::table('dispatch_recipient')->get();
+        $recipients->each(function ($recipient) {
+            DB::table('document_dispatch_contact')->insert([
+                'dispatch_id' => $recipient->dispatch_id,
+                'contact_id'  => $recipient->recipient_id,
+            ]);
+        });
+    }
+}

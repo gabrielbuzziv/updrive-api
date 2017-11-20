@@ -45,7 +45,8 @@ class Document extends Model
         'validity',
         'note',
         'status',
-        'dispatch_id',
+        'resent_at',
+        'resents',
     ];
 
     /**
@@ -62,7 +63,7 @@ class Document extends Model
      *
      * @var array
      */
-    protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'resent_at'];
 
     /**
      * Scope pending documents.
@@ -183,17 +184,22 @@ class Document extends Model
                     'label' => 'label-warning',
                 ];
             case 3:
-            case 4:
                 return [
                     'id'    => $value,
                     'name'  => 'Aberto',
                     'label' => 'label-success',
                 ];
-            case 5:
+            case 4:
                 return [
                     'id'    => $value,
                     'name'  => 'Vencido',
                     'label' => 'label-danger',
+                ];
+            case 5:
+                return [
+                    'id'    => $value,
+                    'name'  => 'Pausado',
+                    'label' => '',
                 ];
         }
     }
@@ -315,12 +321,12 @@ class Document extends Model
     }
 
     /**
-     * A document has one dispatch.
+     * A document belongs to many dispatches.
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function dispatch()
+    public function dispatches()
     {
-        return $this->belongsTo(DocumentDispatch::class, 'dispatch_id');
+        return $this->belongsToMany(Dispatch::class, 'dispatch_document');
     }
 }

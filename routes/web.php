@@ -5,8 +5,7 @@
  * All webhooks should access this controller.
  */
 Route::post('webhook/tracking-deliveries', 'WebhookController@trackingDeliveries');
-Route::post('webhook/tracking-opened', 'WebhookController@trackingOpened');
-Route::post('webhook/tracking-spams', 'WebhookController@trackingSpams');
+Route::post('webhook/tracking-read', 'WebhookController@trackingRead');
 Route::post('webhook/tracking-bounces', 'WebhookController@trackingBounces');
 Route::post('webhook/tracking-dropped', 'WebhookController@trackingDropped');
 

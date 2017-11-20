@@ -148,8 +148,8 @@ class DashboardController extends ApiController
      */
     private function getDocumentsFromDaysAgo($days)
     {
-        $start = Carbon::today()->subDays($days)->format('Y-m-d');
-        $end = Carbon::today()->format('Y-m-d');
+        $start = Carbon::today()->subDays($days)->hour(0)->minute(0)->second(0)->format('Y-m-d H:i:s');
+        $end = Carbon::today()->hour(23)->minute(59)->second(59)->format('Y-m-d H:i:s');
 
         return (new DocumentHistory())
             ->select(

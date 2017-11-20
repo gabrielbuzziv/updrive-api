@@ -109,6 +109,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::get('updrive/pending', 'UPDriveController@pending');
     Route::get('updrive/documents', 'UPDriveController@documents');
     Route::post('updrive/send', 'UPDriveController@send');
+    Route::post('updrive/{document}/resend', 'UPDriveController@resend');
 
     /**
      * AccountController routes

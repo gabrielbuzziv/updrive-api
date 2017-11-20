@@ -31,15 +31,24 @@ class ExpiringDocumentsNotification extends Notification
     protected $token;
 
     /**
+     * Days.
+     *
+     * @var
+     */
+    protected $days;
+
+    /**
      * Create a new notification instance.
      *
      * ExpiringDocumentsNotification constructor.
      * @param $data
+     * @param $days
      */
-    public function __construct($data)
+    public function __construct($data, $days)
     {
         $this->documents = $this->transformCollection($data->documents, new DocumentTransformer());
         $this->token = JWTAuth::fromUser($data->contact);
+        $this->days = $days;
     }
 
     /**
@@ -61,15 +70,15 @@ class ExpiringDocumentsNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        $subject = 'Não esqueça de baixar os documentos';
+        $subject = $this->getData()->subject;
         $account = config('account');
 
         return (new MailMessage())
             ->from(env('MAIL_FROM_ADDRESS'), $account->name)
-            ->subject(sprintf('%s: %s', $account->name, $subject))
+            ->subject(sprintf('%s', $account->name, $subject))
             ->view('emails.default', [
                 'subject'       => $subject,
-                'description'   => 'Identificamos que alguns documentos que enviamos para você ainda não foram baixados, evite perder a data de vencimento. Abaixo está os documentos com vencimento para hoje.',
+                'description'   => $this->getData()->description,
                 'documents'     => $this->documents,
                 'regards'       => [
                     'name'  => $account->name,
