@@ -109,7 +109,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     /**
      * UPDriveController routes.
      */
-    Route::get('updrive/{dispatch}/document-dispatch', 'UPDriveController@dispatchDetails');
+    Route::get('updrive/{document}/dispatches', 'UPDriveController@dispatchDetails');
     Route::get('updrive/companies', 'UPDriveController@companies');
     Route::get('updrive/pending', 'UPDriveController@pending');
     Route::get('updrive/documents', 'UPDriveController@documents');

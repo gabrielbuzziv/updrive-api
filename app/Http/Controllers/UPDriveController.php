@@ -210,11 +210,13 @@ class UPDriveController extends ApiController
     /*
      * Get document dispatch details.
      *
-     * @param DocumentDispatch $dispatch
+     * @param Document $document
      * @return mixed
      */
-    public function dispatchDetails(DocumentDispatch $dispatch)
+    public function dispatchDetails(Document $document)
     {
+        $dispatch = $document->dispatches()->first();
+
         return $this->respond($this->transformItem($dispatch, new DispatchTransformer()));
     }
 
