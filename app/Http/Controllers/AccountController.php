@@ -42,6 +42,9 @@ class AccountController extends ApiController
     {
         $account = config('account');
 
-        return $this->respond(['status' => (bool) $account->active]);
+        return $this->respond([
+            'status'          => (bool) $account->active,
+            'trial_expire_at' => $account->trial_expire_at
+        ]);
     }
 }
